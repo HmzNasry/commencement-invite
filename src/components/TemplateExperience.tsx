@@ -1,4 +1,4 @@
-import { type CSSProperties, type TouchEvent, type WheelEvent, useRef, useState } from 'react'
+import { type CSSProperties, type TouchEvent, type WheelEvent, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react'
 import { BlurFade } from './animation/InvitationMotion'
@@ -17,6 +17,8 @@ export default function TemplateExperience() {
   const language = getLanguage()
   const isRtl = language === 'fa'
   const pageCount = invitationTemplate.pages.length
+  const intro = invitationTemplate.universityIntro
+  const [introComplete, setIntroComplete] = useState(!intro.enabled)
   const [currentPage, setCurrentPage] = useState(0)
   const touchStartRef = useRef<number | null>(null)
   const snapLockRef = useRef(false)
@@ -81,6 +83,15 @@ export default function TemplateExperience() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      <AnimatePresence>
+        {!introComplete && (
+          <GraduationIntro
+            language={language}
+            onComplete={() => setIntroComplete(true)}
+          />
+        )}
+      </AnimatePresence>
+
       <div className="page-progress-pill is-visible" dir="ltr" aria-label={`Page ${currentPage + 1} of ${pageCount}`}>
         <span>{currentPage + 1}</span>
         <span aria-hidden="true">/</span>
@@ -118,6 +129,130 @@ export default function TemplateExperience() {
         </button>
       </nav>
     </main>
+  )
+}
+
+function GraduationIntro({ language, onComplete }: { language: InvitationLanguage; onComplete: () => void }) {
+  const intro = invitationTemplate.universityIntro
+  const colors = intro.colors
+
+  useEffect(() => {
+    const timer = window.setTimeout(onComplete, intro.durationMs)
+    return () => window.clearTimeout(timer)
+  }, [intro.durationMs, onComplete])
+
+  return (
+    <motion.div
+      className="graduation-intro"
+      style={
+        {
+          '--university-primary': colors.primary,
+          '--university-secondary': colors.secondary,
+          '--university-accent': colors.accent,
+          '--university-ink': colors.ink,
+        } as CSSProperties
+      }
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
+      exit={{
+        opacity: 0,
+        filter: 'blur(18px)',
+        scale: 1.035,
+        transition: { duration: 0.86, ease: [0.19, 1, 0.22, 1] },
+      }}
+    >
+      <motion.div
+        className="graduation-intro-backdrop"
+        initial={{ scale: 1.08, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
+      />
+      <div className="graduation-intro-particles" aria-hidden="true">
+        {Array.from({ length: 18 }, (_, index) => (
+          <motion.span
+            key={index}
+            style={
+              {
+                '--particle-x': `${((index * 47) % 100) - 50}vw`,
+                '--particle-y': `${((index * 29) % 100) - 50}svh`,
+                '--particle-delay': `${index * 0.045}s`,
+              } as CSSProperties
+            }
+            initial={{ opacity: 0, scale: 0.2, x: 0, y: 0 }}
+            animate={{
+              opacity: [0, 0.68, 0],
+              scale: [0.2, 1, 0.4],
+              x: `var(--particle-x)`,
+              y: `var(--particle-y)`,
+            }}
+            transition={{ duration: 2.8, delay: 0.25 + index * 0.035, ease: [0.19, 1, 0.22, 1] }}
+          />
+        ))}
+      </div>
+      <motion.div
+        className="graduation-intro-mark-stage"
+        initial={{ opacity: 0, scale: 0.84, rotateX: 18 }}
+        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+        transition={{ duration: 1.05, delay: 0.22, ease: [0.19, 1, 0.22, 1] }}
+      >
+        <motion.svg className="graduation-intro-ring" viewBox="0 0 240 240" aria-hidden="true">
+          <motion.circle
+            cx="120"
+            cy="120"
+            r="96"
+            pathLength="1"
+            initial={{ pathLength: 0, rotate: -90 }}
+            animate={{ pathLength: 1, rotate: 270 }}
+            transition={{ duration: 1.5, delay: 0.32, ease: [0.19, 1, 0.22, 1] }}
+          />
+          <motion.circle
+            cx="120"
+            cy="120"
+            r="74"
+            pathLength="1"
+            initial={{ pathLength: 0, rotate: 90 }}
+            animate={{ pathLength: 1, rotate: -210 }}
+            transition={{ duration: 1.35, delay: 0.48, ease: [0.19, 1, 0.22, 1] }}
+          />
+        </motion.svg>
+        <motion.div
+          className="graduation-intro-logo"
+          initial={{ clipPath: 'inset(50% 50% 50% 50%)', filter: 'blur(18px)' }}
+          animate={{ clipPath: 'inset(0% 0% 0% 0%)', filter: 'blur(0px)' }}
+          transition={{ duration: 0.95, delay: 0.7, ease: [0.19, 1, 0.22, 1] }}
+        >
+          {intro.logoSrc ? (
+            <img src={intro.logoSrc} alt={intro.name[language]} />
+          ) : (
+            <span>{intro.monogram}</span>
+          )}
+        </motion.div>
+        <motion.div
+          className="graduation-intro-light-sweep"
+          initial={{ x: '-140%', opacity: 0 }}
+          animate={{ x: '145%', opacity: [0, 1, 0] }}
+          transition={{ duration: 1.05, delay: 1.08, ease: [0.19, 1, 0.22, 1] }}
+        />
+      </motion.div>
+      <motion.div
+        className="graduation-intro-copy"
+        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.85, delay: 1.34, ease: [0.19, 1, 0.22, 1] }}
+      >
+        <p>{intro.label[language]}</p>
+        <h1>{intro.name[language]}</h1>
+      </motion.div>
+      <motion.div
+        className="graduation-intro-reveal-bar"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: Math.max(0.9, intro.durationMs / 1000 - 2.2), delay: 1.72, ease: [0.19, 1, 0.22, 1] }}
+      />
+      <button className="graduation-intro-skip" type="button" onClick={onComplete}>
+        {language === 'fa' ? 'رد کردن' : 'Skip'}
+      </button>
+    </motion.div>
   )
 }
 

@@ -18,13 +18,49 @@ export type TemplatePage = {
   }>
 }
 
+export type UniversityIntro = {
+  enabled: boolean
+  durationMs: number
+  logoSrc?: string
+  monogram: string
+  name: Record<InvitationLanguage, string>
+  label: Record<InvitationLanguage, string>
+  colors: {
+    primary: string
+    secondary: string
+    accent: string
+    ink: string
+  }
+}
+
 export type InvitationTemplate = {
   defaultLanguage: InvitationLanguage
+  universityIntro: UniversityIntro
   pages: TemplatePage[]
 }
 
 export const invitationTemplate: InvitationTemplate = {
   defaultLanguage: 'en',
+  universityIntro: {
+    enabled: true,
+    durationMs: 4200,
+    logoSrc: '',
+    monogram: 'U',
+    name: {
+      en: 'University Name',
+      fa: 'نام دانشگاه',
+    },
+    label: {
+      en: 'Graduation Invitation',
+      fa: 'دعوت‌نامه فراغت',
+    },
+    colors: {
+      primary: '#062b5f',
+      secondary: '#ffffff',
+      accent: '#c9a646',
+      ink: '#04162f',
+    },
+  },
   pages: [
     {
       id: 'cover',
