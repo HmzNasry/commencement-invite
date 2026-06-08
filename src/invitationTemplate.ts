@@ -43,22 +43,22 @@ export const invitationTemplate: InvitationTemplate = {
   defaultLanguage: 'en',
   universityIntro: {
     enabled: true,
-    durationMs: 4200,
-    logoSrc: '',
-    monogram: 'U',
+    durationMs: 5200,
+    logoSrc: '/uw-block-w.png',
+    monogram: 'W',
     name: {
-      en: 'University Name',
-      fa: 'نام دانشگاه',
+      en: 'University of Washington',
+      fa: 'دانشگاه واشنگتن',
     },
     label: {
-      en: 'Graduation Invitation',
-      fa: 'دعوت‌نامه فراغت',
+      en: 'Class of 2026',
+      fa: 'فارغ‌التحصیلان ۲۰۲۶',
     },
     colors: {
-      primary: '#062b5f',
+      primary: '#32006e',
       secondary: '#ffffff',
-      accent: '#c9a646',
-      ink: '#04162f',
+      accent: '#b7a57a',
+      ink: '#1e1238',
     },
   },
   pages: [
@@ -66,21 +66,21 @@ export const invitationTemplate: InvitationTemplate = {
       id: 'cover',
       icon: Heart,
       theme: 'soft',
-      accent: '#d8bfa6',
+      accent: '#b7a57a',
       align: 'center',
       content: {
         en: {
-          eyebrow: 'Invitation Template',
-          title: 'Main Title',
-          subtitle: 'Short line for the first page.',
-          body: ['Replace this with the opening invitation copy.'],
+          eyebrow: 'University of Washington',
+          title: 'Graduation 2026',
+          subtitle: 'A celebration in purple and gold.',
+          body: ['Replace this with the graduate name, ceremony line, or opening invitation copy.'],
           actionLabel: 'Continue',
         },
         fa: {
-          eyebrow: 'قالب دعوت‌نامه',
-          title: 'عنوان اصلی',
-          subtitle: 'جمله کوتاه برای صفحه اول.',
-          body: ['متن شروع دعوت‌نامه را اینجا جایگزین کنید.'],
+          eyebrow: 'دانشگاه واشنگتن',
+          title: 'فراغت ۲۰۲۶',
+          subtitle: 'جشنی با رنگ‌های بنفش و طلایی.',
+          body: ['نام فارغ‌التحصیل، متن مراسم یا دعوت‌نامه را اینجا جایگزین کنید.'],
           actionLabel: 'ادامه',
         },
       },
@@ -89,7 +89,7 @@ export const invitationTemplate: InvitationTemplate = {
       id: 'details',
       icon: CalendarDays,
       theme: 'warm',
-      accent: '#c9976b',
+      accent: '#ffc700',
       align: 'bottom',
       content: {
         en: {
@@ -112,7 +112,7 @@ export const invitationTemplate: InvitationTemplate = {
       id: 'story',
       icon: Sparkles,
       theme: 'fresh',
-      accent: '#9fb37f',
+      accent: '#b7a57a',
       align: 'center',
       content: {
         en: {
@@ -135,7 +135,7 @@ export const invitationTemplate: InvitationTemplate = {
       id: 'notes',
       icon: MapPin,
       theme: 'ink',
-      accent: '#b9c7d1',
+      accent: '#e8e3d3',
       align: 'top',
       content: {
         en: {
@@ -156,7 +156,7 @@ export const invitationTemplate: InvitationTemplate = {
       id: 'closing',
       icon: Heart,
       theme: 'soft',
-      accent: '#d6a8b0',
+      accent: '#b7a57a',
       align: 'center',
       content: {
         en: {

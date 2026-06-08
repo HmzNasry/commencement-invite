@@ -92,7 +92,7 @@ export default function TemplateExperience() {
         )}
       </AnimatePresence>
 
-      <div className="page-progress-pill is-visible" dir="ltr" aria-label={`Page ${currentPage + 1} of ${pageCount}`}>
+      <div className={`page-progress-pill ${introComplete ? 'is-visible' : ''}`} dir="ltr" aria-label={`Page ${currentPage + 1} of ${pageCount}`}>
         <span>{currentPage + 1}</span>
         <span aria-hidden="true">/</span>
         <span>{pageCount}</span>
@@ -109,7 +109,7 @@ export default function TemplateExperience() {
         />
       </AnimatePresence>
 
-      <nav className="template-page-nav" aria-label="Invitation pages" dir="ltr">
+      <nav className={`template-page-nav ${introComplete ? 'is-visible' : ''}`} aria-label="Invitation pages" dir="ltr">
         <button type="button" onClick={goToPreviousPage} disabled={currentPage === 0} aria-label="Previous page">
           <ArrowLeft aria-hidden="true" />
         </button>
@@ -167,8 +167,43 @@ function GraduationIntro({ language, onComplete }: { language: InvitationLanguag
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
       />
+      <motion.div
+        className="graduation-intro-year"
+        aria-hidden="true"
+        initial={{ opacity: 0, scale: 1.28, y: 60, filter: 'blur(28px)' }}
+        animate={{
+          opacity: [0, 0.22, 0.16],
+          scale: [1.28, 1, 0.96],
+          y: [60, 0, -18],
+          filter: ['blur(28px)', 'blur(0px)', 'blur(6px)'],
+        }}
+        transition={{ duration: 2.7, delay: 0.16, ease: [0.19, 1, 0.22, 1] }}
+      >
+        2026
+      </motion.div>
+      <motion.div
+        className="graduation-intro-year-foreground"
+        aria-hidden="true"
+        initial={{ opacity: 0, letterSpacing: '0.32em', y: 24 }}
+        animate={{ opacity: [0, 1, 1, 0], letterSpacing: ['0.32em', '0.08em', '0.08em', '0.18em'], y: [24, 0, 0, -18] }}
+        transition={{ duration: 2.7, delay: 2.06, ease: [0.19, 1, 0.22, 1] }}
+      >
+        2026
+      </motion.div>
+      <div className="graduation-intro-aurora" aria-hidden="true">
+        <motion.span
+          initial={{ x: '-30%', opacity: 0, rotate: -8 }}
+          animate={{ x: '28%', opacity: [0, 0.8, 0.24], rotate: 4 }}
+          transition={{ duration: 3.2, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
+        />
+        <motion.span
+          initial={{ x: '24%', opacity: 0, rotate: 9 }}
+          animate={{ x: '-22%', opacity: [0, 0.52, 0.2], rotate: -5 }}
+          transition={{ duration: 3.4, delay: 0.54, ease: [0.19, 1, 0.22, 1] }}
+        />
+      </div>
       <div className="graduation-intro-particles" aria-hidden="true">
-        {Array.from({ length: 18 }, (_, index) => (
+        {Array.from({ length: 30 }, (_, index) => (
           <motion.span
             key={index}
             style={
@@ -185,7 +220,7 @@ function GraduationIntro({ language, onComplete }: { language: InvitationLanguag
               x: `var(--particle-x)`,
               y: `var(--particle-y)`,
             }}
-            transition={{ duration: 2.8, delay: 0.25 + index * 0.035, ease: [0.19, 1, 0.22, 1] }}
+            transition={{ duration: 3.1, delay: 0.18 + index * 0.026, ease: [0.19, 1, 0.22, 1] }}
           />
         ))}
       </div>
@@ -242,6 +277,22 @@ function GraduationIntro({ language, onComplete }: { language: InvitationLanguag
       >
         <p>{intro.label[language]}</p>
         <h1>{intro.name[language]}</h1>
+      </motion.div>
+      <motion.div
+        className="graduation-intro-caps"
+        aria-hidden="true"
+        initial={{ opacity: 0, y: 32 }}
+        animate={{ opacity: [0, 1, 0.76], y: [32, 0, -12] }}
+        transition={{ duration: 2.1, delay: 1.52, ease: [0.19, 1, 0.22, 1] }}
+      >
+        {Array.from({ length: 7 }, (_, index) => (
+          <motion.span
+            key={index}
+            initial={{ y: 0, rotate: -8 + index * 3 }}
+            animate={{ y: [-2, -18 - index * 3, -4], rotate: [-8 + index * 3, 8 - index * 2, -4 + index] }}
+            transition={{ duration: 2.8, delay: 1.55 + index * 0.07, repeat: Infinity, repeatType: 'mirror', ease: [0.45, 0, 0.2, 1] }}
+          />
+        ))}
       </motion.div>
       <motion.div
         className="graduation-intro-reveal-bar"
