@@ -55,7 +55,7 @@ export const invitationTemplate: InvitationTemplate = {
     monogram: 'W',
     invite: {
       en: "You're Invited",
-      fa: 'شما را دعوت می‌کنم',
+      fa: 'شما را دعوت می‌کنیم',
     },
     occasion: {
       en: 'Commencement\nCeremony',
