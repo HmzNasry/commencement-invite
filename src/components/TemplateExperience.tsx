@@ -1,6 +1,6 @@
-import { type CSSProperties, type TouchEvent, type WheelEvent, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, type TouchEvent, type WheelEvent, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Copy, MapPin } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, GraduationCap, MapPin, MoonStar, Utensils, type LucideIcon } from 'lucide-react'
 import ConfettiField from './animation/ConfettiField'
 import GraduationIntro from './animation/GraduationIntro'
 import TimelineReveal from './animation/TimelineReveal'
@@ -14,7 +14,7 @@ const eventDetails = {
     fa: 'June 12, 2026',
   },
   time: {
-    en: 'Ceremony Time: 10:00 a.m.',
+    en: 'Ceremony Time:',
     fa: 'زمان مراسم:',
   },
   duration: {
@@ -42,6 +42,35 @@ const eventDetails = {
     fa: 'مراسم در تاریخ June 12, 2026 به صورت زنده پخش خواهد شد.',
   },
   mapQuery: 'Tacoma Dome 2727 E D St Tacoma WA 98421',
+  locations: [
+    {
+      iconKey: 'cap',
+      name: { en: 'Tacoma Dome', fa: 'Tacoma Dome' },
+      address: { en: '2727 E D St, Tacoma, WA 98421', fa: '2727 E D St, Tacoma, WA 98421' },
+      mapQuery: 'Tacoma Dome 2727 E D St Tacoma WA 98421',
+    },
+    {
+      iconKey: 'mosque',
+      name: { en: 'Islamic Center of Tacoma', fa: 'مرکز اسلامی تاکوما' },
+      address: {
+        en: '1 Montana Ave, Tacoma, WA 98409',
+        fa: '1 Montana Ave, Tacoma, WA 98409',
+      },
+      mapQuery: 'Islamic Center of Tacoma 1 Montana Ave Tacoma WA 98409',
+    },
+    {
+      iconKey: 'lunch',
+      name: { en: 'Lunch Together', fa: 'ناهار دسته‌جمعی' },
+      address: { en: '1814 S G St, Tacoma, WA 98405', fa: '1814 S G St, Tacoma, WA 98405' },
+      mapQuery: '1814 S G St Tacoma WA 98405',
+    },
+  ],
+}
+
+const LOCATION_ICONS: Record<string, LucideIcon> = {
+  cap: GraduationCap,
+  mosque: MoonStar,
+  lunch: Utensils,
 }
 
 function getLanguage(): InvitationLanguage {
@@ -94,6 +123,11 @@ export default function TemplateExperience() {
   }
 
   function handleWheel(event: WheelEvent<HTMLElement>) {
+    // Lock scrolling/navigation while the intro animation is playing.
+    if (!introComplete) {
+      event.preventDefault()
+      return
+    }
     if (Math.abs(event.deltaY) < 42) return
     event.preventDefault()
     if (event.deltaY > 0) {
@@ -108,6 +142,10 @@ export default function TemplateExperience() {
   }
 
   function handleTouchEnd(event: TouchEvent<HTMLElement>) {
+    if (!introComplete) {
+      touchStartRef.current = null
+      return
+    }
     if (touchStartRef.current === null) return
     const endY = event.changedTouches[0]?.clientY ?? touchStartRef.current
     const distance = touchStartRef.current - endY
@@ -287,24 +325,6 @@ function EventDetailsCard({
   language: InvitationLanguage
 }) {
   const date = eventDetails.date[language]
-  const location = eventDetails.location[language]
-  const address = eventDetails.address[language]
-  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventDetails.mapQuery)}`
-  const [copied, setCopied] = useState(false)
-  const copiedResetRef = useRef<number | null>(null)
-
-  async function copyLocation() {
-    await navigator.clipboard?.writeText(`${location} - ${address}`)
-    setCopied(true)
-    if (copiedResetRef.current) window.clearTimeout(copiedResetRef.current)
-    copiedResetRef.current = window.setTimeout(() => setCopied(false), 1350)
-  }
-
-  useEffect(() => {
-    return () => {
-      if (copiedResetRef.current) window.clearTimeout(copiedResetRef.current)
-    }
-  }, [])
 
   const sectionReveal = (order: number) => ({ '--reveal-delay': `${180 + order * 130}ms` } as CSSProperties)
   const textReveal = (order: number) => ({ '--reveal-delay': `${360 + order * 120}ms` } as CSSProperties)
@@ -322,58 +342,60 @@ function EventDetailsCard({
           </span>
           <strong className="event-details-text-reveal" dir="ltr" style={textReveal(1)}>{date}</strong>
           <p className="event-details-text-reveal" style={textReveal(2)}>
-            {eventDetails.time[language]} <bdi dir="ltr">10:00 AM</bdi>
+            {eventDetails.time[language]} <bdi dir="ltr">9:30 AM</bdi>
           </p>
-          <em className="event-details-text-reveal" style={textReveal(3)}>{eventDetails.duration[language]}</em>
         </div>
       </section>
 
-      <section className="event-details-location event-details-reveal" style={sectionReveal(1)} aria-label={language === 'fa' ? 'مکان' : 'Location'}>
-        <div>
-          <span className="event-details-label event-details-text-reveal" style={textReveal(5)}>
-            <MapPin aria-hidden="true" />
-            <span>{language === 'fa' ? 'مکان' : 'Location'}</span>
-          </span>
-          <strong className="event-details-text-reveal" style={textReveal(6)}>{location}</strong>
-          <p className="event-details-text-reveal" dir="ltr" style={textReveal(7)}>{address}</p>
+      <section className="event-details-locations-card event-details-reveal" style={sectionReveal(1)} aria-label={language === 'fa' ? 'مکان‌ها' : 'Locations'}>
+        <span className="event-details-label event-details-text-reveal" style={textReveal(5)}>
+          <MapPin aria-hidden="true" />
+          <span>{language === 'fa' ? 'مکان‌ها' : 'Locations'}</span>
+        </span>
+        <div className="event-details-locations">
+          {eventDetails.locations.map((loc, i) => {
+            const LocIcon = LOCATION_ICONS[loc.iconKey]
+            const hasMap = loc.mapQuery.length > 0
+            const inner = (
+              <>
+                <span className="event-details-loc-icon" aria-hidden="true">
+                  <LocIcon />
+                </span>
+                <span className="event-details-loc-text">
+                  <strong>{loc.name[language]}</strong>
+                  <span dir="ltr">{loc.address[language]}</span>
+                </span>
+                {hasMap && (
+                  <span className="event-details-loc-go" aria-hidden="true">
+                    <ArrowUpRight />
+                  </span>
+                )}
+              </>
+            )
+            return hasMap ? (
+              <a
+                key={loc.iconKey}
+                className="event-details-loc event-details-text-reveal"
+                style={textReveal(6 + i)}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.mapQuery)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {inner}
+              </a>
+            ) : (
+              <div key={loc.iconKey} className="event-details-loc is-tba event-details-text-reveal" style={textReveal(6 + i)}>
+                {inner}
+              </div>
+            )
+          })}
         </div>
       </section>
 
       <div className="event-details-actions event-details-reveal" style={sectionReveal(2)}>
-        <a className="event-details-button animated-fill" href={mapsHref} target="_blank" rel="noreferrer">
-          <span>{language === 'fa' ? 'نمایش در نقشه' : 'Open in Maps'}</span>
-        </a>
         <a className="event-details-button animated-fill" href="https://www.tacoma.uw.edu/commencement/livestream" target="_blank" rel="noreferrer">
           <span>{language === 'fa' ? 'پخش زنده' : 'Watch Live'}</span>
         </a>
-        <button className="event-details-button animated-fill" type="button" onClick={copyLocation}>
-          <span className="event-details-copy-icon" aria-hidden="true">
-            <AnimatePresence mode="wait" initial={false}>
-              {copied ? (
-                <motion.span
-                  key="copied"
-                  initial={{ opacity: 0, scale: 0.55, rotate: -42 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.55, rotate: 42 }}
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Check />
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="copy"
-                  initial={{ opacity: 0, scale: 0.65, rotate: 36 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 0.65, rotate: -36 }}
-                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <Copy />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </span>
-          <span>{language === 'fa' ? 'کپی مکان' : 'Copy'}</span>
-        </button>
       </div>
     </div>
   )

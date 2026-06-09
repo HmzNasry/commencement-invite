@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Award, GraduationCap, Sparkles, type LucideIcon } from 'lucide-react'
+import { Camera, GraduationCap, MoonStar, Utensils, type LucideIcon } from 'lucide-react'
 import type { InvitationLanguage } from '../../invitationTemplate'
 
 const EASE = [0.19, 1, 0.22, 1] as const
@@ -12,70 +12,93 @@ const NODE_RADIUS = 29
 const OVERVIEW_TOP_PAD = 78
 const OVERVIEW_BOTTOM_PAD = 22
 
+const mapsUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+
 type TimelineNode = {
   icon: LucideIcon
   caption: string
   time: string
   title: string
   description: string
+  address?: string
 }
 
 const NODES: TimelineNode[] = [
   {
     icon: GraduationCap,
-    caption: 'Ceremony Time',
-    time: '10:00 AM',
-    title: 'Commencement Ceremony',
-    description: 'Estimated duration: 2 hours, 30 minutes.',
+    caption: 'Ceremony',
+    time: '9:30 AM – 12:30 PM',
+    title: 'UW Tacoma Commencement Ceremony',
+    description: 'Tacoma Dome',
+    address: '2727 E D St, Tacoma, WA 98421',
   },
   {
-    icon: Award,
-    caption: 'Lorem ipsum',
-    time: '5:00 PM',
-    title: 'Dolor Sit Amet',
-    description: 'Sed do eiusmod tempor incididunt ut labore et dolore.',
+    icon: Camera,
+    caption: 'Reception',
+    time: '12:30 PM – 1:30 PM',
+    title: 'Celebration & Photos',
+    description: 'With friends & family · Around Tacoma Dome',
   },
   {
-    icon: Sparkles,
-    caption: 'Lorem ipsum',
-    time: '7:30 PM',
-    title: 'Consectetur Elit',
-    description: 'Ut enim ad minim veniam, quis nostrud exercitation.',
+    icon: MoonStar,
+    caption: 'Prayer',
+    time: '1:30 PM – 2:30 PM',
+    title: 'Jummah Prayer',
+    description: 'Islamic Center of Tacoma',
+    address: '1 Montana Ave, Tacoma, WA 98409',
+  },
+  {
+    icon: Utensils,
+    caption: 'Meal',
+    time: '3:00 PM – onward',
+    title: 'Lunch Together',
+    description: '',
+    address: '1814 S G St, Tacoma, WA 98405',
   },
 ]
 
 const NODES_FA: TimelineNode[] = [
   {
     icon: GraduationCap,
-    caption: 'زمان مراسم',
-    time: '10:00 AM',
-    title: 'مراسم فارغ‌التحصیلی',
-    description: 'مدت زمان تقریبی: 2 ساعت و 30 دقیقه.',
+    caption: 'مراسم',
+    time: '9:30 AM – 12:30 PM',
+    title: 'محفل فراغت',
+    description: 'Tacoma Dome',
+    address: '2727 E D St, Tacoma, WA 98421',
   },
   {
-    icon: Award,
-    caption: 'برنامه',
-    time: '5:00 PM',
-    title: 'خوش‌آمدگویی و عکس‌ها',
-    description: 'فرصتی برای سلام، دیدار، و ثبت عکس‌های یادگاری.',
+    icon: Camera,
+    caption: 'پذیرایی',
+    time: '12:30 PM – 1:30 PM',
+    title: 'جشن و عکس‌ها',
+    description: 'همراه دوستان و خانواده · اطراف Tacoma Dome',
   },
   {
-    icon: Sparkles,
-    caption: 'پایان',
-    time: '7:30 PM',
-    title: 'جشن و خداحافظی',
-    description: 'پایان مراسم و لحظه‌های آخر کنار خانواده و دوستان.',
+    icon: MoonStar,
+    caption: 'نماز',
+    time: '1:30 PM – 2:30 PM',
+    title: 'نماز جمعه',
+    description: 'مرکز اسلامی تاکوما',
+    address: '1 Montana Ave, Tacoma, WA 98409',
+  },
+  {
+    icon: Utensils,
+    caption: 'ناهار',
+    time: '3:00 PM – onward',
+    title: 'ناهار دسته‌جمعی',
+    description: '',
+    address: '1814 S G St, Tacoma, WA 98405',
   },
 ]
-
-const MIDPOINT_LABEL: Record<InvitationLanguage, string> = {
-  en: '- Greetings + Pictures',
-  fa: '- خوش‌آمدگویی + عکس‌ها',
-}
 
 const TIMELINE_TITLE: Record<InvitationLanguage, string> = {
   en: 'Timeline',
   fa: 'برنامه مراسم',
+}
+
+const HINT: Record<InvitationLanguage, string> = {
+  en: 'Tap a step for details',
+  fa: 'برای جزئیات روی هر مرحله بزنید',
 }
 
 export default function TimelineReveal({ language = 'en' }: { language?: InvitationLanguage }) {
@@ -86,6 +109,7 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 })
   // step 0..N-1 focuses a node; step === N is the zoomed-out overview.
   const [step, setStep] = useState(reduce ? nodes.length : 0)
+  const [interacted, setInteracted] = useState(false)
 
   useLayoutEffect(() => {
     const el = viewportRef.current
@@ -98,12 +122,29 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
   }, [])
 
   useEffect(() => {
-    if (reduce || step >= nodes.length) return
+    // Auto-play stops as soon as the user takes control.
+    if (reduce || interacted || step >= nodes.length) return
     const timer = window.setTimeout(() => setStep((s) => s + 1), step === 0 ? STEP_MS + 400 : STEP_MS)
     return () => window.clearTimeout(timer)
-  }, [nodes.length, step, reduce])
+  }, [nodes.length, step, reduce, interacted])
 
   const zoomedOut = step >= nodes.length
+
+  function zoomInto(i: number) {
+    setInteracted(true)
+    setStep(i)
+  }
+
+  function zoomOut() {
+    setInteracted(true)
+    setStep(nodes.length)
+  }
+
+  // Tap a node row to zoom in; tap anywhere while zoomed in to zoom back out.
+  function handleViewportClick() {
+    if (!zoomedOut) zoomOut()
+  }
+
   const activeGap = zoomedOut ? OVERVIEW_NODE_GAP : NODE_GAP
   const span = (nodes.length - 1) * activeGap
 
@@ -121,7 +162,7 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
   const fillH = zoomedOut ? span : Math.min(step, nodes.length - 1) * activeGap
 
   return (
-    <div className={`timeline-reveal${isRtl ? ' is-timeline-rtl' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`timeline-reveal${isRtl ? ' is-timeline-rtl' : ''}${zoomedOut ? '' : ' is-zoomed-in'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       <motion.h2
         className="timeline-reveal-title"
         initial={reduce ? false : { opacity: 0, y: -14, filter: 'blur(8px)' }}
@@ -131,7 +172,7 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
         {TIMELINE_TITLE[language]}
       </motion.h2>
 
-      <div className="timeline-viewport" ref={viewportRef}>
+      <div className="timeline-viewport" ref={viewportRef} onClick={handleViewportClick}>
         {viewportSize.height > 0 && (
           <motion.div
             className="timeline-stage"
@@ -145,23 +186,22 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
               animate={{ height: fillH }}
               transition={{ duration: reduce ? 0 : 1.85, ease: EASE }}
             />
-            <motion.div
-              className="timeline-midpoint-label"
-              style={{ top: activeGap / 2 }}
-              initial={false}
-              animate={{ opacity: zoomedOut ? 1 : 0, x: zoomedOut ? 0 : 10, y: '-50%' }}
-              transition={{ duration: reduce ? 0 : 0.7, delay: zoomedOut && !reduce ? 1.05 : 0, ease: EASE }}
-            >
-              {MIDPOINT_LABEL[language]}
-            </motion.div>
-
             {nodes.map((node, i) => {
               const Icon = node.icon
               const reached = zoomedOut || step >= i
               const active = !zoomedOut && step === i
               const visible = active || zoomedOut
               return (
-                <div key={i} className={`timeline-node-wrap${active ? ' is-active-wrap' : ''}${zoomedOut ? ' is-overview-wrap' : ''}`} style={{ top: i * activeGap }}>
+                <div
+                  key={i}
+                  className={`timeline-node-wrap${active ? ' is-active-wrap' : ''}${zoomedOut ? ' is-overview-wrap' : ''}`}
+                  style={{ top: i * activeGap }}
+                  onClick={() => {
+                    if (zoomedOut) zoomInto(i)
+                  }}
+                >
+                  {/* wide transparent hit area so the whole row is tappable */}
+                  <span className="timeline-node-hit" aria-hidden="true" />
                   <div className={`timeline-node${reached ? ' is-reached' : ''}${active ? ' is-active' : ''}`}>
                     <Icon aria-hidden="true" />
                   </div>
@@ -171,32 +211,34 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
                     transition={{ duration: 0.72, ease: EASE }}
                   >
                     {active ? (
-                      <>
-                        <motion.span
-                          className="timeline-node-time"
-                          dir="ltr"
-                          initial={{ opacity: 0, y: 6, filter: 'blur(6px)' }}
-                          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                          transition={{ duration: 0.58, delay: 0.08, ease: EASE }}
-                        >
-                          {node.time}
-                        </motion.span>
-                      </>
+                      <motion.span
+                        className="timeline-node-time"
+                        dir="ltr"
+                        initial={{ opacity: 0, y: 6, filter: 'blur(6px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.58, delay: 0.08, ease: EASE }}
+                      >
+                        {node.time}
+                      </motion.span>
                     ) : (
-                      <>
-                        <span className="timeline-node-time" dir="ltr">{node.time}</span>
-                      </>
+                      <span className="timeline-node-time" dir="ltr">{node.time}</span>
                     )}
+
                     {active ? (
-                      <>
-                        <motion.h3
-                          className="timeline-node-title"
-                          initial={{ opacity: 0, y: 8, filter: 'blur(8px)' }}
-                          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                          transition={{ duration: 0.72, delay: 0.2, ease: EASE }}
-                        >
-                          {node.title}
-                        </motion.h3>
+                      <motion.h3
+                        className="timeline-node-title"
+                        initial={{ opacity: 0, y: 8, filter: 'blur(8px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.72, delay: 0.2, ease: EASE }}
+                      >
+                        {node.title}
+                      </motion.h3>
+                    ) : (
+                      <h3 className="timeline-node-title">{node.title}</h3>
+                    )}
+
+                    {node.description && (active || !zoomedOut) && (
+                      active ? (
                         <motion.p
                           className="timeline-node-desc"
                           initial={{ opacity: 0, y: 8, filter: 'blur(8px)' }}
@@ -205,12 +247,25 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
                         >
                           {node.description}
                         </motion.p>
-                      </>
-                    ) : (
-                      <>
-                        <h3 className="timeline-node-title">{node.title}</h3>
-                        {!zoomedOut && <p className="timeline-node-desc">{node.description}</p>}
-                      </>
+                      ) : (
+                        <p className="timeline-node-desc">{node.description}</p>
+                      )
+                    )}
+
+                    {active && node.address && (
+                      <motion.a
+                        className="timeline-node-address-link"
+                        dir="ltr"
+                        href={mapsUrl(node.address)}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        initial={{ opacity: 0, y: 8, filter: 'blur(8px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        transition={{ duration: 0.72, delay: 0.56, ease: EASE }}
+                      >
+                        {node.address}
+                      </motion.a>
                     )}
                   </motion.div>
                 </div>
@@ -219,6 +274,15 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
           </motion.div>
         )}
       </div>
+
+      <motion.p
+        className="timeline-hint"
+        aria-hidden="true"
+        animate={{ opacity: zoomedOut ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: EASE }}
+      >
+        {HINT[language]}
+      </motion.p>
     </div>
   )
 }
