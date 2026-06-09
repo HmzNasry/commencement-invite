@@ -1833,22 +1833,36 @@ a {
   padding-bottom: calc(clamp(16px, 3svh, 28px) + 92px);
 }
 
-.timeline-reveal::before {
+/* Progressive "fading blur" into the header: a taller soft layer plus a
+   shorter stronger layer up top, both feathered so the blur ramps smoothly. */
+.timeline-reveal::before,
+.timeline-reveal::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   z-index: 3;
-  height: clamp(170px, 27svh, 250px);
-  background:
-    linear-gradient(180deg, rgba(5, 4, 8, 0.38), rgba(9, 7, 13, 0.18) 48%, rgba(9, 7, 13, 0.04) 76%, transparent),
-    radial-gradient(circle at 50% 18%, rgba(183, 165, 122, 0.06), transparent 56%);
-  -webkit-backdrop-filter: blur(13px);
-  backdrop-filter: blur(13px);
-  -webkit-mask: linear-gradient(180deg, #000 0 36%, rgba(0, 0, 0, 0.66) 62%, rgba(0, 0, 0, 0.18) 86%, transparent 100%);
-  mask: linear-gradient(180deg, #000 0 36%, rgba(0, 0, 0, 0.66) 62%, rgba(0, 0, 0, 0.18) 86%, transparent 100%);
   pointer-events: none;
+}
+
+.timeline-reveal::before {
+  height: clamp(180px, 28svh, 260px);
+  background:
+    linear-gradient(180deg, rgba(5, 4, 8, 0.4), rgba(9, 7, 13, 0.18) 46%, rgba(9, 7, 13, 0.04) 74%, transparent),
+    radial-gradient(circle at 50% 16%, rgba(183, 165, 122, 0.06), transparent 56%);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask: linear-gradient(180deg, #000 0 30%, rgba(0, 0, 0, 0.72) 56%, rgba(0, 0, 0, 0.32) 78%, rgba(0, 0, 0, 0.1) 92%, transparent 100%);
+  mask: linear-gradient(180deg, #000 0 30%, rgba(0, 0, 0, 0.72) 56%, rgba(0, 0, 0, 0.32) 78%, rgba(0, 0, 0, 0.1) 92%, transparent 100%);
+}
+
+.timeline-reveal::after {
+  height: clamp(120px, 19svh, 180px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask: linear-gradient(180deg, #000 0 34%, rgba(0, 0, 0, 0.5) 64%, rgba(0, 0, 0, 0.16) 86%, transparent 100%);
+  mask: linear-gradient(180deg, #000 0 34%, rgba(0, 0, 0, 0.5) 64%, rgba(0, 0, 0, 0.16) 86%, transparent 100%);
 }
 
 .timeline-reveal-title {
