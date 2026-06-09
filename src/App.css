@@ -358,7 +358,7 @@ a {
   margin: 0;
   text-align: center;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(2.65rem, 10.2cqw, 5.25rem);
+  font-size: clamp(2.25rem, 8.4cqw, 4.35rem);
   font-weight: 500;
   letter-spacing: 0.06em;
   line-height: 0.92;
