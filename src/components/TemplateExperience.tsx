@@ -159,6 +159,8 @@ export default function TemplateExperience() {
         </div>
       )}
 
+      {introComplete && <div className="template-bottom-blur" aria-hidden="true" />}
+
       <nav className={`template-page-nav ${navVisible ? 'is-visible' : ''}`} aria-label="Invitation pages" dir="ltr">
         <button className="animated-fill" type="button" onClick={goToPreviousPage} disabled={currentPage === 0} aria-label="Previous page">
           <ArrowLeft aria-hidden="true" />

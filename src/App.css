@@ -418,7 +418,7 @@ a {
 .grad-intro-graduate {
   margin: 0;
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(3.05rem, 11.8cqw, 6.25rem);
+  font-size: clamp(2.5rem, 9.7cqw, 5.1rem);
   font-weight: 500;
   line-height: 1.02;
   color: #ffffff;
@@ -442,7 +442,7 @@ a {
 .is-rtl .grad-intro-graduate {
   direction: rtl;
   font-family: 'Noto Naskh Arabic', 'Mirza', serif;
-  font-size: clamp(2.62rem, 9.6cqw, 5.2rem);
+  font-size: clamp(3.15rem, 11.6cqw, 6.2rem);
 }
 
 /* Confetti rides above the vignette but below the reveal text. */
@@ -1143,13 +1143,15 @@ a {
 
 .template-page-nav {
   position: absolute;
-  left: 50%;
+  left: clamp(10px, 3vw, 18px);
+  right: clamp(10px, 3vw, 18px);
   bottom: clamp(16px, 3svh, 28px);
   z-index: 60;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 11px;
-  padding: 7px;
+  padding: 7px 12px;
   border: 1px solid rgba(255, 250, 243, 0.16);
   border-radius: 999px;
   background: rgba(12, 10, 8, 0.42);
@@ -1158,7 +1160,7 @@ a {
   -webkit-backdrop-filter: blur(16px);
   isolation: isolate;
   opacity: 0;
-  transform: translateX(-50%);
+  transform: translateY(8px);
   transition:
     opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -1167,10 +1169,10 @@ a {
 .template-page-nav::before {
   content: '';
   position: absolute;
-  left: 50%;
+  left: calc(-1 * clamp(10px, 3vw, 18px));
+  right: calc(-1 * clamp(10px, 3vw, 18px));
   bottom: -20px;
   z-index: -1;
-  width: min(100cqw, 430px);
   height: 142px;
   border-radius: 34px 34px 0 0;
   background: transparent;
@@ -1178,14 +1180,38 @@ a {
   backdrop-filter: blur(10px);
   -webkit-mask: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.62) 34%, #000 100%);
   mask: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.62) 34%, #000 100%);
-  transform: translateX(-50%);
   pointer-events: none;
 }
 
 .template-page-nav.is-visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
   transition-delay: 680ms;
+}
+
+/* Progressive fading blur at the bottom of every page (mirrors the timeline
+   header): content blurs + fades as it nears the bottom nav. */
+.template-bottom-blur {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 50;
+  height: clamp(125px, 21svh, 195px);
+  pointer-events: none;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask: linear-gradient(to top, #000 0 30%, rgba(0, 0, 0, 0.72) 56%, rgba(0, 0, 0, 0.32) 78%, rgba(0, 0, 0, 0.1) 92%, transparent 100%);
+  mask: linear-gradient(to top, #000 0 30%, rgba(0, 0, 0, 0.72) 56%, rgba(0, 0, 0, 0.32) 78%, rgba(0, 0, 0, 0.1) 92%, transparent 100%);
+}
+
+.template-bottom-blur::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(85px, 14svh, 135px);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask: linear-gradient(to top, #000 0 34%, rgba(0, 0, 0, 0.5) 64%, rgba(0, 0, 0, 0.16) 86%, transparent 100%);
+  mask: linear-gradient(to top, #000 0 34%, rgba(0, 0, 0, 0.5) 64%, rgba(0, 0, 0, 0.16) 86%, transparent 100%);
 }
 
 .template-bottom-progress {
@@ -1813,7 +1839,6 @@ a {
   }
 
   .template-page-nav {
-    width: calc(100cqw - 28px);
     justify-content: space-between;
   }
 }
