@@ -1916,10 +1916,10 @@ a {
   width: 100%;
   min-height: 0;
   overflow: hidden;
-  /* Fade content out toward the top so it dissolves under the blurred header
-     instead of getting hard-clipped at the edge. */
-  -webkit-mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 100%);
-  mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 100%);
+  /* Fade content out toward both edges so it dissolves under the blurred
+     header (top) and into the bottom blur (bottom) instead of hard-clipping. */
+  -webkit-mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 74%, rgba(0, 0, 0, 0.55) 87%, rgba(0, 0, 0, 0.16) 96%, transparent 100%);
+  mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 74%, rgba(0, 0, 0, 0.55) 87%, rgba(0, 0, 0, 0.16) 96%, transparent 100%);
 }
 
 .timeline-stage {
