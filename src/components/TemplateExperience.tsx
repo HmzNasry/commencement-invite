@@ -1,10 +1,48 @@
 import { type CSSProperties, type TouchEvent, type WheelEvent, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react'
-import { BlurFade } from './animation/InvitationMotion'
-import { pageTransition, revealTransition } from './animation/motionPresets'
+import { ArrowDown, ArrowLeft, ArrowRight, CalendarDays, Check, Copy, MapPin } from 'lucide-react'
+import ConfettiField from './animation/ConfettiField'
+import GraduationIntro from './animation/GraduationIntro'
+import TimelineReveal from './animation/TimelineReveal'
+import { pageTransition } from './animation/motionPresets'
 import useAnimatedFill from '../hooks/useAnimatedFill'
 import { invitationTemplate, type InvitationLanguage, type TemplatePage } from '../invitationTemplate'
+
+const eventDetails = {
+  date: {
+    en: 'June 12, 2026',
+    fa: 'June 12, 2026',
+  },
+  time: {
+    en: 'Ceremony Time: 10:00 a.m.',
+    fa: 'زمان مراسم:',
+  },
+  duration: {
+    en: 'Estimated Duration: 2 hours, 30 minutes',
+    fa: 'ورود مهمانان ساعت ۹ صبح است',
+  },
+  location: {
+    en: 'Tacoma Dome',
+    fa: 'Tacoma Dome',
+  },
+  address: {
+    en: '2727 E D St, Tacoma, WA 98421',
+    fa: '2727 E D St, Tacoma, WA 98421',
+  },
+  intro: {
+    en: 'Get Ready Class of 2026!',
+    fa: 'فارغ‌التحصیلان ۲۰۲۶ آماده باشید!',
+  },
+  note: {
+    en: 'We will be back at the Tacoma Dome to celebrate the 36th Commencement Ceremony of UW Tacoma.',
+    fa: 'برای برگزاری 36th Commencement Ceremony دانشگاه UW Tacoma به Tacoma Dome بازمی‌گردیم.',
+  },
+  live: {
+    en: 'The ceremony will be broadcasted live on June 12, 2026',
+    fa: 'مراسم در تاریخ June 12, 2026 به صورت زنده پخش خواهد شد.',
+  },
+  mapQuery: 'Tacoma Dome 2727 E D St Tacoma WA 98421',
+}
 
 function getLanguage(): InvitationLanguage {
   const lang = new URLSearchParams(window.location.search).get('lang')
@@ -16,13 +54,20 @@ export default function TemplateExperience() {
 
   const language = getLanguage()
   const isRtl = language === 'fa'
-  const pageCount = invitationTemplate.pages.length
+  const detailsPage = invitationTemplate.pages.find((page) => page.id === 'details')
+  const templatePages = detailsPage
+    ? [detailsPage, ...invitationTemplate.pages.filter((page) => page.id !== 'details')]
+    : invitationTemplate.pages
+  const pageCount = templatePages.length
+  const totalPageCount = pageCount + 1
   const intro = invitationTemplate.universityIntro
   const [introComplete, setIntroComplete] = useState(!intro.enabled)
+  const [introRevealed, setIntroRevealed] = useState(!intro.enabled)
   const [currentPage, setCurrentPage] = useState(0)
   const touchStartRef = useRef<number | null>(null)
   const snapLockRef = useRef(false)
-  const currentTemplatePage = invitationTemplate.pages[currentPage] ?? invitationTemplate.pages[0]
+  const currentTemplatePage = templatePages[currentPage - 1] ?? templatePages[0]
+  const navVisible = introComplete || introRevealed
 
   function lockSnap() {
     snapLockRef.current = true
@@ -33,9 +78,10 @@ export default function TemplateExperience() {
 
   function goToPage(nextPage: number) {
     if (snapLockRef.current) return
-    const clampedPage = Math.min(pageCount - 1, Math.max(0, nextPage))
+    const clampedPage = Math.min(totalPageCount - 1, Math.max(0, nextPage))
     if (clampedPage === currentPage) return
     lockSnap()
+    setIntroComplete(clampedPage > 0)
     setCurrentPage(clampedPage)
   }
 
@@ -86,224 +132,54 @@ export default function TemplateExperience() {
       <AnimatePresence>
         {!introComplete && (
           <GraduationIntro
+            key="reveal"
             language={language}
-            onComplete={() => setIntroComplete(true)}
+            onComplete={() => goToPage(1)}
+            onReveal={() => setIntroRevealed(true)}
+            initialRevealed={introRevealed}
           />
         )}
       </AnimatePresence>
 
-      <div className={`page-progress-pill ${introComplete ? 'is-visible' : ''}`} dir="ltr" aria-label={`Page ${currentPage + 1} of ${pageCount}`}>
-        <span>{currentPage + 1}</span>
-        <span aria-hidden="true">/</span>
-        <span>{pageCount}</span>
-      </div>
-
-      <AnimatePresence mode="wait">
-        <TemplatePageView
-          key={currentTemplatePage.id}
-          page={currentTemplatePage}
-          language={language}
-          pageNumber={currentPage + 1}
-          onNext={goToNextPage}
-          isLastPage={currentPage === pageCount - 1}
-        />
+      <AnimatePresence mode="sync">
+        {introComplete && (
+          <TemplatePageView
+            key={currentTemplatePage.id}
+            page={currentTemplatePage}
+            language={language}
+            pageNumber={currentPage}
+            onNext={goToNextPage}
+            isLastPage={currentPage === totalPageCount - 1}
+          />
+        )}
       </AnimatePresence>
+      {introComplete && (
+        <div className={`template-confetti-layer ${currentTemplatePage.id === 'details' ? 'is-details-page' : ''}`} aria-hidden="true">
+          <ConfettiField />
+        </div>
+      )}
 
-      <nav className={`template-page-nav ${introComplete ? 'is-visible' : ''}`} aria-label="Invitation pages" dir="ltr">
-        <button type="button" onClick={goToPreviousPage} disabled={currentPage === 0} aria-label="Previous page">
+      <nav className={`template-page-nav ${navVisible ? 'is-visible' : ''}`} aria-label="Invitation pages" dir="ltr">
+        <button className="animated-fill" type="button" onClick={goToPreviousPage} disabled={currentPage === 0} aria-label="Previous page">
           <ArrowLeft aria-hidden="true" />
         </button>
         <div className="template-page-dots">
-          {invitationTemplate.pages.map((page, index) => (
+          {Array.from({ length: totalPageCount }, (_, index) => (
             <button
               type="button"
-              key={page.id}
+              key={index === 0 ? 'commencement-intro' : templatePages[index - 1]?.id}
               className={index === currentPage ? 'is-active' : ''}
               onClick={() => goToPage(index)}
               aria-label={`Go to page ${index + 1}`}
             />
           ))}
         </div>
-        <button type="button" onClick={goToNextPage} disabled={currentPage === pageCount - 1} aria-label="Next page">
+        <button className="animated-fill" type="button" onClick={goToNextPage} disabled={currentPage === totalPageCount - 1} aria-label="Next page">
           <ArrowRight aria-hidden="true" />
         </button>
       </nav>
+      <div className={`template-bottom-progress ${navVisible ? 'is-visible' : ''}`} aria-hidden="true" />
     </main>
-  )
-}
-
-function GraduationIntro({ language, onComplete }: { language: InvitationLanguage; onComplete: () => void }) {
-  const intro = invitationTemplate.universityIntro
-  const colors = intro.colors
-
-  useEffect(() => {
-    const timer = window.setTimeout(onComplete, intro.durationMs)
-    return () => window.clearTimeout(timer)
-  }, [intro.durationMs, onComplete])
-
-  return (
-    <motion.div
-      className="graduation-intro"
-      style={
-        {
-          '--university-primary': colors.primary,
-          '--university-secondary': colors.secondary,
-          '--university-accent': colors.accent,
-          '--university-ink': colors.ink,
-        } as CSSProperties
-      }
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-      exit={{
-        opacity: 0,
-        filter: 'blur(18px)',
-        scale: 1.035,
-        transition: { duration: 0.86, ease: [0.19, 1, 0.22, 1] },
-      }}
-    >
-      <motion.div
-        className="graduation-intro-backdrop"
-        initial={{ scale: 1.08, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
-      />
-      <motion.div
-        className="graduation-intro-year"
-        aria-hidden="true"
-        initial={{ opacity: 0, scale: 1.28, y: 60, filter: 'blur(28px)' }}
-        animate={{
-          opacity: [0, 0.22, 0.16],
-          scale: [1.28, 1, 0.96],
-          y: [60, 0, -18],
-          filter: ['blur(28px)', 'blur(0px)', 'blur(6px)'],
-        }}
-        transition={{ duration: 2.7, delay: 0.16, ease: [0.19, 1, 0.22, 1] }}
-      >
-        2026
-      </motion.div>
-      <motion.div
-        className="graduation-intro-year-foreground"
-        aria-hidden="true"
-        initial={{ opacity: 0, letterSpacing: '0.32em', y: 24 }}
-        animate={{ opacity: [0, 1, 1, 0], letterSpacing: ['0.32em', '0.08em', '0.08em', '0.18em'], y: [24, 0, 0, -18] }}
-        transition={{ duration: 2.7, delay: 2.06, ease: [0.19, 1, 0.22, 1] }}
-      >
-        2026
-      </motion.div>
-      <div className="graduation-intro-aurora" aria-hidden="true">
-        <motion.span
-          initial={{ x: '-30%', opacity: 0, rotate: -8 }}
-          animate={{ x: '28%', opacity: [0, 0.8, 0.24], rotate: 4 }}
-          transition={{ duration: 3.2, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
-        />
-        <motion.span
-          initial={{ x: '24%', opacity: 0, rotate: 9 }}
-          animate={{ x: '-22%', opacity: [0, 0.52, 0.2], rotate: -5 }}
-          transition={{ duration: 3.4, delay: 0.54, ease: [0.19, 1, 0.22, 1] }}
-        />
-      </div>
-      <div className="graduation-intro-particles" aria-hidden="true">
-        {Array.from({ length: 30 }, (_, index) => (
-          <motion.span
-            key={index}
-            style={
-              {
-                '--particle-x': `${((index * 47) % 100) - 50}vw`,
-                '--particle-y': `${((index * 29) % 100) - 50}svh`,
-                '--particle-delay': `${index * 0.045}s`,
-              } as CSSProperties
-            }
-            initial={{ opacity: 0, scale: 0.2, x: 0, y: 0 }}
-            animate={{
-              opacity: [0, 0.68, 0],
-              scale: [0.2, 1, 0.4],
-              x: `var(--particle-x)`,
-              y: `var(--particle-y)`,
-            }}
-            transition={{ duration: 3.1, delay: 0.18 + index * 0.026, ease: [0.19, 1, 0.22, 1] }}
-          />
-        ))}
-      </div>
-      <motion.div
-        className="graduation-intro-mark-stage"
-        initial={{ opacity: 0, scale: 0.84, rotateX: 18 }}
-        animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-        transition={{ duration: 1.05, delay: 0.22, ease: [0.19, 1, 0.22, 1] }}
-      >
-        <motion.svg className="graduation-intro-ring" viewBox="0 0 240 240" aria-hidden="true">
-          <motion.circle
-            cx="120"
-            cy="120"
-            r="96"
-            pathLength="1"
-            initial={{ pathLength: 0, rotate: -90 }}
-            animate={{ pathLength: 1, rotate: 270 }}
-            transition={{ duration: 1.5, delay: 0.32, ease: [0.19, 1, 0.22, 1] }}
-          />
-          <motion.circle
-            cx="120"
-            cy="120"
-            r="74"
-            pathLength="1"
-            initial={{ pathLength: 0, rotate: 90 }}
-            animate={{ pathLength: 1, rotate: -210 }}
-            transition={{ duration: 1.35, delay: 0.48, ease: [0.19, 1, 0.22, 1] }}
-          />
-        </motion.svg>
-        <motion.div
-          className="graduation-intro-logo"
-          initial={{ clipPath: 'inset(50% 50% 50% 50%)', filter: 'blur(18px)' }}
-          animate={{ clipPath: 'inset(0% 0% 0% 0%)', filter: 'blur(0px)' }}
-          transition={{ duration: 0.95, delay: 0.7, ease: [0.19, 1, 0.22, 1] }}
-        >
-          {intro.logoSrc ? (
-            <img src={intro.logoSrc} alt={intro.name[language]} />
-          ) : (
-            <span>{intro.monogram}</span>
-          )}
-        </motion.div>
-        <motion.div
-          className="graduation-intro-light-sweep"
-          initial={{ x: '-140%', opacity: 0 }}
-          animate={{ x: '145%', opacity: [0, 1, 0] }}
-          transition={{ duration: 1.05, delay: 1.08, ease: [0.19, 1, 0.22, 1] }}
-        />
-      </motion.div>
-      <motion.div
-        className="graduation-intro-copy"
-        initial={{ opacity: 0, y: 24, filter: 'blur(12px)' }}
-        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        transition={{ duration: 0.85, delay: 1.34, ease: [0.19, 1, 0.22, 1] }}
-      >
-        <p>{intro.label[language]}</p>
-        <h1>{intro.name[language]}</h1>
-      </motion.div>
-      <motion.div
-        className="graduation-intro-caps"
-        aria-hidden="true"
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: [0, 1, 0.76], y: [32, 0, -12] }}
-        transition={{ duration: 2.1, delay: 1.52, ease: [0.19, 1, 0.22, 1] }}
-      >
-        {Array.from({ length: 7 }, (_, index) => (
-          <motion.span
-            key={index}
-            initial={{ y: 0, rotate: -8 + index * 3 }}
-            animate={{ y: [-2, -18 - index * 3, -4], rotate: [-8 + index * 3, 8 - index * 2, -4 + index] }}
-            transition={{ duration: 2.8, delay: 1.55 + index * 0.07, repeat: Infinity, repeatType: 'mirror', ease: [0.45, 0, 0.2, 1] }}
-          />
-        ))}
-      </motion.div>
-      <motion.div
-        className="graduation-intro-reveal-bar"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: Math.max(0.9, intro.durationMs / 1000 - 2.2), delay: 1.72, ease: [0.19, 1, 0.22, 1] }}
-      />
-      <button className="graduation-intro-skip" type="button" onClick={onComplete}>
-        {language === 'fa' ? 'رد کردن' : 'Skip'}
-      </button>
-    </motion.div>
   )
 }
 
@@ -322,10 +198,11 @@ function TemplatePageView({
 }) {
   const content = page.content[language]
   const Icon = page.icon
+  const revealStyle = (index: number) => ({ '--reveal-delay': `${180 + index * 130}ms` } as CSSProperties)
 
   return (
     <motion.section
-      className={`template-page template-page-${page.align ?? 'center'} template-page-theme-${page.theme ?? 'soft'}`}
+      className={`template-page template-page-${page.id} template-page-${page.align ?? 'center'} template-page-theme-${page.theme ?? 'soft'}`}
       aria-label={content.title}
       style={{ '--template-accent': page.accent ?? '#d6c0a1' } as CSSProperties}
       variants={pageTransition}
@@ -334,36 +211,168 @@ function TemplatePageView({
       exit="exit"
     >
       <div className="template-page-scrim" aria-hidden="true" />
+      {page.id === 'closing' ? (
+        <TimelineReveal language={language} />
+      ) : (
       <div className="template-page-shell">
-        <BlurFade className="template-page-content">
+        <div className="template-page-content">
+          {page.id === 'details' ? (
+            <EventDetailsCard language={language} />
+          ) : (
+            <>
           {Icon && (
-            <span className="template-page-icon" aria-hidden="true">
+            <span
+              className="template-page-icon template-reveal-item"
+              aria-hidden="true"
+                  style={revealStyle(0)}
+            >
               <Icon />
             </span>
           )}
-          {content.eyebrow && <p className="template-page-eyebrow">{content.eyebrow}</p>}
-          <h1>{content.title}</h1>
-          {content.subtitle && <p className="template-page-subtitle">{content.subtitle}</p>}
-          {content.body?.map((line) => <p key={line}>{line}</p>)}
+          {content.eyebrow && (
+            <p className="template-page-eyebrow template-reveal-item" style={revealStyle(1)}>
+              {content.eyebrow}
+            </p>
+          )}
+          <h1 className="template-reveal-item" style={revealStyle(2)}>
+            {content.title}
+          </h1>
+          {content.subtitle && (
+            <p className="template-page-subtitle template-reveal-item" style={revealStyle(3)}>
+              {content.subtitle}
+            </p>
+          )}
+          {content.body?.map((line, index) => (
+            <p key={line} className="template-reveal-item" style={revealStyle(4 + index)}>
+              {line}
+            </p>
+          ))}
           {content.meta && (
-            <div className="template-page-meta">
+            <div className="template-page-meta template-reveal-item" style={revealStyle(4 + (content.body?.length ?? 0))}>
               {content.meta.map((item) => <span key={item}>{item}</span>)}
             </div>
           )}
           {content.actionLabel && !isLastPage && (
             <motion.button
-              className="template-page-action animated-fill"
+              className="template-page-action animated-fill template-reveal-item"
               type="button"
               onClick={onNext}
-              variants={revealTransition}
+              style={revealStyle(5 + (content.body?.length ?? 0) + (content.meta ? 1 : 0))}
             >
               <span>{content.actionLabel}</span>
               <ArrowDown aria-hidden="true" />
             </motion.button>
           )}
-          <span className="template-page-number" aria-hidden="true">{String(pageNumber).padStart(2, '0')}</span>
-        </BlurFade>
+          <span
+            className="template-page-number template-reveal-item"
+            aria-hidden="true"
+            style={revealStyle(6 + (content.body?.length ?? 0) + (content.meta ? 1 : 0) + (content.actionLabel && !isLastPage ? 1 : 0))}
+          >
+            {String(pageNumber).padStart(2, '0')}
+          </span>
+            </>
+          )}
+        </div>
       </div>
+      )}
     </motion.section>
+  )
+}
+
+function EventDetailsCard({
+  language,
+}: {
+  language: InvitationLanguage
+}) {
+  const date = eventDetails.date[language]
+  const location = eventDetails.location[language]
+  const address = eventDetails.address[language]
+  const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventDetails.mapQuery)}`
+  const [copied, setCopied] = useState(false)
+  const copiedResetRef = useRef<number | null>(null)
+
+  async function copyLocation() {
+    await navigator.clipboard?.writeText(`${location} - ${address}`)
+    setCopied(true)
+    if (copiedResetRef.current) window.clearTimeout(copiedResetRef.current)
+    copiedResetRef.current = window.setTimeout(() => setCopied(false), 1350)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (copiedResetRef.current) window.clearTimeout(copiedResetRef.current)
+    }
+  }, [])
+
+  const sectionReveal = (order: number) => ({ '--reveal-delay': `${180 + order * 130}ms` } as CSSProperties)
+  const textReveal = (order: number) => ({ '--reveal-delay': `${360 + order * 120}ms` } as CSSProperties)
+
+  return (
+    <div className="event-details-card">
+      <div className="event-details-border-beam-mask" aria-hidden="true">
+        <div className="event-details-rotating-beam" />
+      </div>
+      <section className="event-details-date event-details-reveal" style={sectionReveal(0)} aria-label={language === 'fa' ? 'تاریخ' : 'Date'}>
+        <div>
+          <span className="event-details-label event-details-text-reveal" style={textReveal(0)}>
+            <CalendarDays aria-hidden="true" />
+            <span>{language === 'fa' ? 'تاریخ' : 'Date'}</span>
+          </span>
+          <strong className="event-details-text-reveal" dir="ltr" style={textReveal(1)}>{date}</strong>
+          <p className="event-details-text-reveal" style={textReveal(2)}>
+            {eventDetails.time[language]} <bdi dir="ltr">10:00 AM</bdi>
+          </p>
+          <em className="event-details-text-reveal" style={textReveal(3)}>{eventDetails.duration[language]}</em>
+        </div>
+      </section>
+
+      <section className="event-details-location event-details-reveal" style={sectionReveal(1)} aria-label={language === 'fa' ? 'مکان' : 'Location'}>
+        <div>
+          <span className="event-details-label event-details-text-reveal" style={textReveal(5)}>
+            <MapPin aria-hidden="true" />
+            <span>{language === 'fa' ? 'مکان' : 'Location'}</span>
+          </span>
+          <strong className="event-details-text-reveal" style={textReveal(6)}>{location}</strong>
+          <p className="event-details-text-reveal" dir="ltr" style={textReveal(7)}>{address}</p>
+        </div>
+      </section>
+
+      <div className="event-details-actions event-details-reveal" style={sectionReveal(2)}>
+        <a className="event-details-button animated-fill" href={mapsHref} target="_blank" rel="noreferrer">
+          <span>{language === 'fa' ? 'نمایش در نقشه' : 'Open in Maps'}</span>
+        </a>
+        <a className="event-details-button animated-fill" href="https://www.tacoma.uw.edu/commencement/livestream" target="_blank" rel="noreferrer">
+          <span>{language === 'fa' ? 'پخش زنده' : 'Watch Live'}</span>
+        </a>
+        <button className="event-details-button animated-fill" type="button" onClick={copyLocation}>
+          <span className="event-details-copy-icon" aria-hidden="true">
+            <AnimatePresence mode="wait" initial={false}>
+              {copied ? (
+                <motion.span
+                  key="copied"
+                  initial={{ opacity: 0, scale: 0.55, rotate: -42 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.55, rotate: 42 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Check />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="copy"
+                  initial={{ opacity: 0, scale: 0.65, rotate: 36 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.65, rotate: -36 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Copy />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </span>
+          <span>{language === 'fa' ? 'کپی مکان' : 'Copy'}</span>
+        </button>
+      </div>
+    </div>
   )
 }

@@ -34,7 +34,7 @@ export function BlurFade({ children, className, delay = 0, ...props }: RevealPro
       initial={prefersReducedMotion ? false : 'hidden'}
       animate="visible"
       exit={prefersReducedMotion ? undefined : 'exit'}
-      transition={prefersReducedMotion ? undefined : { delay, duration: 0.82, ease: [0.19, 1, 0.22, 1] }}
+      transition={prefersReducedMotion ? undefined : { delay, duration: 0.92, ease: [0.16, 1, 0.3, 1] }}
       {...props}
     >
       {children}

@@ -1,4 +1,4 @@
-import { CalendarDays, Heart, MapPin, Sparkles, type LucideIcon } from 'lucide-react'
+import { CalendarDays, Heart, type LucideIcon } from 'lucide-react'
 
 export type InvitationLanguage = 'en' | 'fa'
 
@@ -21,8 +21,13 @@ export type TemplatePage = {
 export type UniversityIntro = {
   enabled: boolean
   durationMs: number
+  inviteDurationMs: number
   logoSrc?: string
+  inviteLogoSrc?: string
   monogram: string
+  invite: Record<InvitationLanguage, string>
+  occasion: Record<InvitationLanguage, string>
+  graduate: Record<InvitationLanguage, string>
   name: Record<InvitationLanguage, string>
   label: Record<InvitationLanguage, string>
   colors: {
@@ -43,16 +48,30 @@ export const invitationTemplate: InvitationTemplate = {
   defaultLanguage: 'en',
   universityIntro: {
     enabled: true,
-    durationMs: 5200,
+    durationMs: 15400,
+    inviteDurationMs: 3100,
     logoSrc: '/uw-block-w.png',
+    inviteLogoSrc: '/w-gold.png',
     monogram: 'W',
+    invite: {
+      en: "You're Invited",
+      fa: 'شما را دعوت می‌کنم',
+    },
+    occasion: {
+      en: 'Commencement\nCeremony',
+      fa: 'محفل\nفراغت',
+    },
+    graduate: {
+      en: 'Asadullah Nasry',
+      fa: 'اسدالله نصری',
+    },
     name: {
-      en: 'University of Washington',
-      fa: 'دانشگاه واشنگتن',
+      en: 'University of Washington Tacoma',
+      fa: 'University of Washington Tacoma',
     },
     label: {
       en: 'Class of 2026',
-      fa: 'فارغ‌التحصیلان ۲۰۲۶',
+      fa: 'صنف ‎2026',
     },
     colors: {
       primary: '#32006e',
@@ -62,29 +81,6 @@ export const invitationTemplate: InvitationTemplate = {
     },
   },
   pages: [
-    {
-      id: 'cover',
-      icon: Heart,
-      theme: 'soft',
-      accent: '#b7a57a',
-      align: 'center',
-      content: {
-        en: {
-          eyebrow: 'University of Washington',
-          title: 'Graduation 2026',
-          subtitle: 'A celebration in purple and gold.',
-          body: ['Replace this with the graduate name, ceremony line, or opening invitation copy.'],
-          actionLabel: 'Continue',
-        },
-        fa: {
-          eyebrow: 'دانشگاه واشنگتن',
-          title: 'فراغت ۲۰۲۶',
-          subtitle: 'جشنی با رنگ‌های بنفش و طلایی.',
-          body: ['نام فارغ‌التحصیل، متن مراسم یا دعوت‌نامه را اینجا جایگزین کنید.'],
-          actionLabel: 'ادامه',
-        },
-      },
-    },
     {
       id: 'details',
       icon: CalendarDays,
@@ -104,50 +100,6 @@ export const invitationTemplate: InvitationTemplate = {
           title: 'تاریخ، زمان و مکان',
           body: ['جزئیات مهم مراسم را اینجا قرار دهید.'],
           meta: ['جای تاریخ', 'جای زمان', 'جای مکان'],
-          actionLabel: 'بعدی',
-        },
-      },
-    },
-    {
-      id: 'story',
-      icon: Sparkles,
-      theme: 'fresh',
-      accent: '#b7a57a',
-      align: 'center',
-      content: {
-        en: {
-          eyebrow: 'Page Section',
-          title: 'Content Page',
-          subtitle: 'Use this page for a note, schedule, story, or custom section.',
-          body: ['Add one or more paragraphs in the template file.'],
-          actionLabel: 'Continue',
-        },
-        fa: {
-          eyebrow: 'بخش صفحه',
-          title: 'صفحه محتوا',
-          subtitle: 'از این صفحه برای یادداشت، برنامه، داستان یا بخش دلخواه استفاده کنید.',
-          body: ['یک یا چند پاراگراف را در فایل قالب اضافه کنید.'],
-          actionLabel: 'ادامه',
-        },
-      },
-    },
-    {
-      id: 'notes',
-      icon: MapPin,
-      theme: 'ink',
-      accent: '#e8e3d3',
-      align: 'top',
-      content: {
-        en: {
-          eyebrow: 'Notes',
-          title: 'Helpful Information',
-          body: ['Add reminders, directions, dress code, gift note, or anything else.'],
-          actionLabel: 'Next',
-        },
-        fa: {
-          eyebrow: 'یادداشت‌ها',
-          title: 'اطلاعات مفید',
-          body: ['یادآوری‌ها، مسیر، پوشش، هدیه یا هر نکته دیگر را اضافه کنید.'],
           actionLabel: 'بعدی',
         },
       },
