@@ -1,11 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "has": [{ "type": "query", "key": "lang", "value": "fa" }],
-      "destination": "/index-fa.html"
-    },
-    {
       "source": "/invitation/:token",
       "destination": "/index.html"
     }
