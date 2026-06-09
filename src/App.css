@@ -1891,6 +1891,10 @@ a {
   width: 100%;
   min-height: 0;
   overflow: hidden;
+  /* Fade content out toward the top so it dissolves under the blurred header
+     instead of getting hard-clipped at the edge. */
+  -webkit-mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 100%);
+  mask: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.18) 9%, rgba(0, 0, 0, 0.62) 20%, #000 34%, #000 100%);
 }
 
 .timeline-stage {
@@ -2005,14 +2009,12 @@ a {
   width: 58px;
   height: 58px;
   border-radius: 999px;
-  border: 2px solid rgba(255, 250, 243, 0.28);
-  background: rgba(255, 250, 243, 0.035);
-  color: rgba(255, 250, 243, 0.46);
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
   transform: translate(-50%, -50%);
   overflow: hidden;
   transition: color 650ms ease, border-color 650ms ease, background 650ms ease, box-shadow 650ms ease;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 .timeline-node::before {
@@ -2044,7 +2046,7 @@ a {
 
 .timeline-node.is-reached {
   border-color: rgba(183, 165, 122, 0.88);
-  color: #2a1c00;
+  color: #0c0a05;
   box-shadow:
     0 0 10px rgba(232, 227, 211, 0.42),
     0 0 24px rgba(183, 165, 122, 0.42),
