@@ -5,14 +5,14 @@ import { LiaMosqueSolid } from 'react-icons/lia'
 import type { InvitationLanguage } from '../../invitationTemplate'
 
 const EASE = [0.19, 1, 0.22, 1] as const
-const NODE_GAP = 220 // px between node centres (stage coordinates)
-const OVERVIEW_NODE_GAP = 184
-const ZOOM = 1.48 // focused-node scale
+const NODE_GAP = 178 // px between node centres (stage coordinates)
+const OVERVIEW_NODE_GAP = 156
+const ZOOM = 1.32 // focused-node scale
 const STEP_MS = 3800 // time spent on each node before moving on
 const NODE_RADIUS = 29
 const OVERVIEW_TOP_PAD = 58
 const OVERVIEW_BOTTOM_PAD = 14
-const OVERVIEW_MAX_SCALE = 0.86
+const OVERVIEW_MAX_SCALE = 0.82
 
 const mapsUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
@@ -156,7 +156,7 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
     if (zoomedOut) {
       const timelineHeight = span + NODE_RADIUS * 2
       scale = Math.min(OVERVIEW_MAX_SCALE, (viewportSize.height - OVERVIEW_TOP_PAD - OVERVIEW_BOTTOM_PAD) / timelineHeight)
-      y = OVERVIEW_TOP_PAD + NODE_RADIUS * scale
+      y = (viewportSize.height - timelineHeight * scale) / 2 + NODE_RADIUS * scale
     } else {
       y = viewportSize.height / 2 - scale * (step * activeGap)
     }

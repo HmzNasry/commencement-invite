@@ -2161,6 +2161,7 @@ a {
   position: absolute;
   left: 0;
   cursor: pointer;
+  transition: opacity 420ms ease, filter 420ms ease;
 }
 
 /* Wide transparent hit area so the whole node row is tappable. */
@@ -2408,6 +2409,12 @@ a {
 /* While zoomed in, tapping anywhere zooms back out. */
 .timeline-reveal.is-zoomed-in .timeline-viewport {
   cursor: pointer;
+}
+
+.timeline-reveal.is-zoomed-in .timeline-node-wrap:not(.is-active-wrap) {
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
 }
 
 .timeline-node-wrap.is-active-wrap .timeline-node-caption {
