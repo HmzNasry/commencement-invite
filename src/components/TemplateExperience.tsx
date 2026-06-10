@@ -1,6 +1,6 @@
 import { type ComponentType, type CSSProperties, type TouchEvent, type WheelEvent, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, GraduationCap, MapPin, Utensils } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, Check, Copy, GraduationCap, MapPin, Utensils } from 'lucide-react'
 import { LiaMosqueSolid } from 'react-icons/lia'
 import ConfettiField from './animation/ConfettiField'
 import GraduationIntro from './animation/GraduationIntro'
@@ -67,6 +67,9 @@ const eventDetails = {
     },
   ],
 }
+
+const contactPhone = '+1 (253) 335-4033'
+const contactPhoneHref = 'tel:+12533354033'
 
 const LOCATION_ICONS: Record<string, ComponentType> = {
   cap: GraduationCap,
@@ -259,6 +262,8 @@ function TemplatePageView({
         <div className="template-page-content">
           {page.id === 'details' ? (
             <EventDetailsCard language={language} />
+          ) : page.id === 'contact' ? (
+            <ContactPage content={content} language={language} />
           ) : (
             <>
           {Icon && (
@@ -317,6 +322,68 @@ function TemplatePageView({
       </div>
       )}
     </motion.section>
+  )
+}
+
+function ContactPage({
+  content,
+  language,
+}: {
+  content: TemplatePage['content'][InvitationLanguage]
+  language: InvitationLanguage
+}) {
+  const [copied, setCopied] = useState(false)
+  const resetRef = useRef<number | null>(null)
+
+  async function copyPhone() {
+    await navigator.clipboard?.writeText(contactPhone)
+    setCopied(true)
+    if (resetRef.current) window.clearTimeout(resetRef.current)
+    resetRef.current = window.setTimeout(() => setCopied(false), 1300)
+  }
+
+  return (
+    <div className="contact-page-card" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+      <p className="contact-page-eyebrow template-reveal-item" style={{ '--reveal-delay': '180ms' } as CSSProperties}>
+        {content.eyebrow}
+      </p>
+      <h1 className="contact-page-title template-reveal-item" style={{ '--reveal-delay': '310ms' } as CSSProperties}>
+        {content.title}
+      </h1>
+      <div className="contact-page-actions template-reveal-item" style={{ '--reveal-delay': '460ms' } as CSSProperties}>
+        <a className="contact-page-phone" href={contactPhoneHref} dir="ltr">
+          {contactPhone}
+        </a>
+        <button className="contact-page-copy animated-fill" type="button" onClick={copyPhone} aria-label={language === 'fa' ? 'کپی شماره' : 'Copy phone number'}>
+          <span className="event-details-copy-icon" aria-hidden="true">
+            <AnimatePresence mode="wait" initial={false}>
+              {copied ? (
+                <motion.span
+                  key="copied"
+                  initial={{ opacity: 0, scale: 0.55, rotate: -42 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.55, rotate: 42 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Check />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="copy"
+                  initial={{ opacity: 0, scale: 0.65, rotate: 36 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.65, rotate: -36 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <Copy />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </span>
+          <span>{language === 'fa' ? 'کپی' : 'Copy'}</span>
+        </button>
+      </div>
+    </div>
   )
 }
 

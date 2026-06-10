@@ -1,4 +1,4 @@
-import { CalendarDays, Heart, type LucideIcon } from 'lucide-react'
+import { CalendarDays, Heart, Phone, type LucideIcon } from 'lucide-react'
 
 export type InvitationLanguage = 'en' | 'fa'
 
@@ -122,6 +122,23 @@ export const invitationTemplate: InvitationTemplate = {
           title: 'برنامه مراسم',
           subtitle: 'راهنمای کوتاه برای روز محفل.',
           body: ['مراسم، تبریکی، نماز و صرف طعام به ترتیب درج شده است.'],
+        },
+      },
+    },
+    {
+      id: 'contact',
+      icon: Phone,
+      theme: 'ink',
+      accent: '#b7a57a',
+      align: 'center',
+      content: {
+        en: {
+          eyebrow: 'Questions',
+          title: 'If you have questions, reach out',
+        },
+        fa: {
+          eyebrow: 'سوالات',
+          title: 'اگر سوالی دارید، تماس بگیرید',
         },
       },
     },
