@@ -545,6 +545,7 @@ a {
   display: inline-flex;
   min-height: 42px;
   align-items: center;
+  flex-direction: row;
   gap: 8px;
   padding: 10px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -556,6 +557,10 @@ a {
   font-size: 0.82rem;
   font-weight: 650;
   transition: border-color 240ms ease, background 240ms ease, color 240ms ease;
+}
+
+.contact-page-copy > span:last-child {
+  unicode-bidi: isolate;
 }
 
 .contact-page-copy:hover,

@@ -347,7 +347,7 @@ function ContactPage({
       <h1 className="contact-page-title template-reveal-item" style={{ '--reveal-delay': '180ms' } as CSSProperties}>
         {content.title}
       </h1>
-      <div className="contact-page-actions template-reveal-item" style={{ '--reveal-delay': '330ms' } as CSSProperties}>
+      <div className="contact-page-actions template-reveal-item" dir="ltr" style={{ '--reveal-delay': '330ms' } as CSSProperties}>
         <a className="contact-page-phone" href={contactPhoneHref} dir="ltr">
           {contactPhone}
         </a>
@@ -377,7 +377,7 @@ function ContactPage({
               )}
             </AnimatePresence>
           </span>
-          <span>{language === 'fa' ? 'کپی' : 'Copy'}</span>
+          <span dir={language === 'fa' ? 'rtl' : 'ltr'}>{language === 'fa' ? 'کپی' : 'Copy'}</span>
         </button>
       </div>
     </div>
