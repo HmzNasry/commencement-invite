@@ -389,9 +389,9 @@ export default function GraduationIntro({
             ashDur={INVITE_ASH_DURATION}
             ashNowSignal={ashNowSignal}
             windScale={0.7}
-            maxSize={92}
-            minSize={36}
-            widthRatio={0.92}
+            maxSize={language === 'fa' ? 58 : 92}
+            minSize={language === 'fa' ? 24 : 36}
+            widthRatio={language === 'fa' ? 0.86 : 0.92}
           />
         </div>
       )}

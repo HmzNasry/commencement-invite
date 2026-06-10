@@ -306,6 +306,11 @@ a {
   height: clamp(132px, 24cqw, 220px);
 }
 
+.is-rtl .grad-intro-overture-text {
+  width: min(84cqw, 620px);
+  height: clamp(230px, 42cqw, 360px);
+}
+
 .grad-intro-spotlight {
   position: absolute;
   top: -18%;

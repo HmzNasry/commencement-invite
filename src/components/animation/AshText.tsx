@@ -10,6 +10,30 @@ type Particle = {
   sparkle: boolean
 }
 
+function wrapTextLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  const lines: string[] = []
+  for (const paragraph of text.split('\n')) {
+    const words = paragraph.trim().split(/\s+/).filter(Boolean)
+    if (words.length === 0) {
+      lines.push('')
+      continue
+    }
+
+    let line = words[0]
+    for (const word of words.slice(1)) {
+      const next = `${line} ${word}`
+      if (ctx.measureText(next).width <= maxWidth) {
+        line = next
+      } else {
+        lines.push(line)
+        line = word
+      }
+    }
+    lines.push(line)
+  }
+  return lines
+}
+
 // Draws crisp text, reveals it left-to-right (the "write"), then lets a wind
 // erode it from the left so it blows off to the right as sparkling ash.
 export default function AshText({
@@ -86,15 +110,29 @@ export default function AshText({
       octx.scale(dpr, dpr)
 
       let size = maxSize
+      const maxTextWidth = W * widthRatio
+      const maxTextHeight = H * 0.88
+      while (size >= minSize) {
+        octx.font = `${fontStyle} ${fontWeight} ${size}px ${fontFamily}`
+        const testLines = wrapTextLines(octx, text, maxTextWidth)
+        const testLineHeight = size * 1.18
+        const widest = Math.max(...testLines.map((line) => octx.measureText(line).width))
+        const totalHeight = testLines.length * testLineHeight
+        if (widest <= maxTextWidth && totalHeight <= maxTextHeight) break
+        size -= 2
+      }
+      size = Math.max(minSize, size)
       octx.font = `${fontStyle} ${fontWeight} ${size}px ${fontFamily}`
-      const measured = octx.measureText(text).width
-      if (measured > W * widthRatio) size = Math.max(minSize, (size * W * widthRatio) / measured)
-      octx.font = `${fontStyle} ${fontWeight} ${size}px ${fontFamily}`
+      const lines = wrapTextLines(octx, text, maxTextWidth)
+      const lineHeight = size * 1.18
       octx.direction = direction
       octx.textAlign = 'center'
       octx.textBaseline = 'middle'
       octx.fillStyle = color
-      octx.fillText(text, W / 2, H / 2)
+      const blockTop = H / 2 - ((lines.length - 1) * lineHeight) / 2
+      lines.forEach((line, index) => {
+        octx.fillText(line, W / 2, blockTop + index * lineHeight)
+      })
       textCanvas = off
 
       const img = octx.getImageData(0, 0, off.width, off.height).data
