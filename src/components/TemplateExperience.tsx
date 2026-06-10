@@ -1,6 +1,7 @@
-import { type CSSProperties, type TouchEvent, type WheelEvent, useRef, useState } from 'react'
+import { type ComponentType, type CSSProperties, type TouchEvent, type WheelEvent, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, GraduationCap, MapPin, MoonStar, Utensils, type LucideIcon } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, CalendarDays, GraduationCap, MapPin, Utensils } from 'lucide-react'
+import { LiaMosqueSolid } from 'react-icons/lia'
 import ConfettiField from './animation/ConfettiField'
 import GraduationIntro from './animation/GraduationIntro'
 import TimelineReveal from './animation/TimelineReveal'
@@ -67,9 +68,9 @@ const eventDetails = {
   ],
 }
 
-const LOCATION_ICONS: Record<string, LucideIcon> = {
+const LOCATION_ICONS: Record<string, ComponentType> = {
   cap: GraduationCap,
-  mosque: MoonStar,
+  mosque: LiaMosqueSolid,
   lunch: Utensils,
 }
 

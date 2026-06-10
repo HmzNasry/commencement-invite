@@ -1,21 +1,23 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { type ComponentType, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Camera, GraduationCap, MoonStar, Utensils, type LucideIcon } from 'lucide-react'
+import { Camera, GraduationCap, Utensils } from 'lucide-react'
+import { LiaMosqueSolid } from 'react-icons/lia'
 import type { InvitationLanguage } from '../../invitationTemplate'
 
 const EASE = [0.19, 1, 0.22, 1] as const
-const NODE_GAP = 300 // px between node centres (stage coordinates)
-const OVERVIEW_NODE_GAP = 248
+const NODE_GAP = 220 // px between node centres (stage coordinates)
+const OVERVIEW_NODE_GAP = 184
 const ZOOM = 1.48 // focused-node scale
 const STEP_MS = 3800 // time spent on each node before moving on
 const NODE_RADIUS = 29
-const OVERVIEW_TOP_PAD = 78
-const OVERVIEW_BOTTOM_PAD = 22
+const OVERVIEW_TOP_PAD = 58
+const OVERVIEW_BOTTOM_PAD = 14
+const OVERVIEW_MAX_SCALE = 0.86
 
 const mapsUrl = (query: string) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
 
 type TimelineNode = {
-  icon: LucideIcon
+  icon: ComponentType
   caption: string
   time: string
   title: string
@@ -40,7 +42,7 @@ const NODES: TimelineNode[] = [
     description: 'With friends & family · Around Tacoma Dome',
   },
   {
-    icon: MoonStar,
+    icon: LiaMosqueSolid,
     caption: 'Prayer',
     time: '1:30 PM – 2:30 PM',
     title: 'Jummah Prayer',
@@ -74,7 +76,7 @@ const NODES_FA: TimelineNode[] = [
     description: 'همراه دوستان و خانواده',
   },
   {
-    icon: MoonStar,
+    icon: LiaMosqueSolid,
     caption: 'نماز',
     time: '1:30 PM – 2:30 PM',
     title: 'نماز جمعه',
@@ -153,7 +155,7 @@ export default function TimelineReveal({ language = 'en' }: { language?: Invitat
   if (viewportSize.height > 0) {
     if (zoomedOut) {
       const timelineHeight = span + NODE_RADIUS * 2
-      scale = Math.min(1, (viewportSize.height - OVERVIEW_TOP_PAD - OVERVIEW_BOTTOM_PAD) / timelineHeight)
+      scale = Math.min(OVERVIEW_MAX_SCALE, (viewportSize.height - OVERVIEW_TOP_PAD - OVERVIEW_BOTTOM_PAD) / timelineHeight)
       y = OVERVIEW_TOP_PAD + NODE_RADIUS * scale
     } else {
       y = viewportSize.height / 2 - scale * (step * activeGap)

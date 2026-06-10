@@ -2030,7 +2030,7 @@ a {
 }
 
 .timeline-reveal::before {
-  height: clamp(156px, 24svh, 226px);
+  height: clamp(132px, 20svh, 196px);
   background:
     linear-gradient(180deg, rgba(5, 4, 8, 0.4), rgba(9, 7, 13, 0.18) 46%, rgba(9, 7, 13, 0.04) 74%, transparent),
     radial-gradient(circle at 50% 16%, rgba(183, 165, 122, 0.06), transparent 56%);
@@ -2041,7 +2041,7 @@ a {
 }
 
 .timeline-reveal::after {
-  height: clamp(102px, 16svh, 156px);
+  height: clamp(82px, 13svh, 132px);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   -webkit-mask: linear-gradient(180deg, #000 0 34%, rgba(0, 0, 0, 0.5) 64%, rgba(0, 0, 0, 0.16) 86%, transparent 100%);
@@ -2051,7 +2051,7 @@ a {
 .timeline-reveal-title {
   position: relative;
   z-index: 4;
-  margin: clamp(12px, 4.5svh, 38px) 0 0;
+  margin: clamp(8px, 3.2svh, 28px) 0 0;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: clamp(2rem, 8vw, 3.2rem);
   font-weight: 500;
@@ -2073,6 +2073,7 @@ a {
   flex: 1;
   width: 100%;
   min-height: 0;
+  margin-top: clamp(-34px, -3.4svh, -16px);
   overflow: hidden;
   /* Fade content out toward both edges so it dissolves under the blurred
      header (top) and into the bottom blur (bottom) instead of hard-clipping. */
