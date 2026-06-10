@@ -344,17 +344,14 @@ function ContactPage({
 
   return (
     <div className="contact-page-card" dir={language === 'fa' ? 'rtl' : 'ltr'}>
-      <p className="contact-page-eyebrow template-reveal-item" style={{ '--reveal-delay': '180ms' } as CSSProperties}>
-        {content.eyebrow}
-      </p>
-      <h1 className="contact-page-title template-reveal-item" style={{ '--reveal-delay': '310ms' } as CSSProperties}>
+      <h1 className="contact-page-title template-reveal-item" style={{ '--reveal-delay': '180ms' } as CSSProperties}>
         {content.title}
       </h1>
-      <div className="contact-page-actions template-reveal-item" style={{ '--reveal-delay': '460ms' } as CSSProperties}>
+      <div className="contact-page-actions template-reveal-item" style={{ '--reveal-delay': '330ms' } as CSSProperties}>
         <a className="contact-page-phone" href={contactPhoneHref} dir="ltr">
           {contactPhone}
         </a>
-        <button className="contact-page-copy animated-fill" type="button" onClick={copyPhone} aria-label={language === 'fa' ? 'کپی شماره' : 'Copy phone number'}>
+        <button className="contact-page-copy" type="button" onClick={copyPhone} aria-label={language === 'fa' ? 'کپی شماره' : 'Copy phone number'}>
           <span className="event-details-copy-icon" aria-hidden="true">
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
