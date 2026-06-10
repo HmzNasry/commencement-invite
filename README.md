@@ -1,6 +1,6 @@
-# Invitation Template
+# Commencement Invite
 
-Frontend-only invitation template built with React, TypeScript, Vite, Framer Motion, GSAP, and Lucide icons.
+UW Tacoma commencement invitation for Asadullah Nasry.
 
 ## Local development
 
@@ -11,9 +11,9 @@ npm run dev
 
 The app is static and has no backend/API dependency.
 
-## Template editing
+## Content Editing
 
-All editable invitation copy and page structure lives in `src/invitationTemplate.ts`. Add, remove, or reorder items in the `pages` array to build a new card.
+Editable invitation copy and page structure lives in `src/invitationTemplate.ts`.
 
 Reusable transition helpers live in `src/components/animation/`:
 

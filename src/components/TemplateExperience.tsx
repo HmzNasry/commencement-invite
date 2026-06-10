@@ -60,7 +60,7 @@ const eventDetails = {
     },
     {
       iconKey: 'lunch',
-      name: { en: 'Lunch Together', fa: 'ناهار دسته‌جمعی' },
+      name: { en: 'Lunch Together', fa: 'صرف طعام' },
       address: { en: '1814 S G St, Tacoma, WA 98405', fa: '1814 S G St, Tacoma, WA 98405' },
       mapQuery: '1814 S G St Tacoma WA 98405',
     },

@@ -2,14 +2,14 @@ export const config = {
   matcher: ['/'],
 }
 
-// Serve the Farsi document (with Farsi OG tags + preview image) for ?lang=fa,
-// so link-preview crawlers (WhatsApp / Facebook) get the Farsi description.
+// Serve the exact social-preview HTML for the root URL. This avoids stale static
+// root previews and gives crawlers the Farsi tags when ?lang=fa is present.
 export default async function middleware(request: Request) {
   const url = new URL(request.url)
-  if (url.searchParams.get('lang') !== 'fa') return
+  const entry = url.searchParams.get('lang') === 'fa' ? '/index-fa.html' : '/index.html'
 
-  const faUrl = new URL('/index-fa.html', url.origin)
-  const response = await fetch(faUrl.toString())
+  const entryUrl = new URL(entry, url.origin)
+  const response = await fetch(entryUrl.toString())
   const html = await response.text()
 
   return new Response(html, {

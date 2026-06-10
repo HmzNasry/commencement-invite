@@ -4,8 +4,8 @@ import { Camera, GraduationCap, MoonStar, Utensils, type LucideIcon } from 'luci
 import type { InvitationLanguage } from '../../invitationTemplate'
 
 const EASE = [0.19, 1, 0.22, 1] as const
-const NODE_GAP = 330 // px between node centres (stage coordinates)
-const OVERVIEW_NODE_GAP = 276
+const NODE_GAP = 300 // px between node centres (stage coordinates)
+const OVERVIEW_NODE_GAP = 248
 const ZOOM = 1.48 // focused-node scale
 const STEP_MS = 3800 // time spent on each node before moving on
 const NODE_RADIUS = 29
@@ -70,8 +70,8 @@ const NODES_FA: TimelineNode[] = [
     icon: Camera,
     caption: 'پذیرایی',
     time: '12:30 PM – 1:30 PM',
-    title: 'سلام و عکس‌ها',
-    description: 'همراه دوستان و خانواده · اطراف Tacoma Dome',
+    title: 'تبریکی و عکس گروپی',
+    description: 'همراه دوستان و خانواده',
   },
   {
     icon: MoonStar,
@@ -83,9 +83,9 @@ const NODES_FA: TimelineNode[] = [
   },
   {
     icon: Utensils,
-    caption: 'ناهار',
+    caption: 'صرف طعام',
     time: '3:00 PM – onward',
-    title: 'ناهار دسته‌جمعی',
+    title: 'صرف طعام',
     description: '',
     address: '1814 S G St, Tacoma, WA 98405',
   },
@@ -98,7 +98,7 @@ const TIMELINE_TITLE: Record<InvitationLanguage, string> = {
 
 const HINT: Record<InvitationLanguage, string> = {
   en: 'Tap a step for details',
-  fa: 'برای جزئیات روی هر مرحله بزنید',
+  fa: 'برای جزئیات روی هر مرحله کلیک کنید',
 }
 
 export default function TimelineReveal({ language = 'en' }: { language?: InvitationLanguage }) {
