@@ -8,10 +8,10 @@ import { invitationTemplate, type InvitationLanguage } from '../../invitationTem
 
 // When the cap + reveal text begin, after the invite logo has slowly grown and ashed away.
 const REVEAL_AT_MS = 6800
-const REVEAL_AT_SECONDS = REVEAL_AT_MS / 1000
 const INVITE_WRITE_START = 1.42
 const INVITE_WRITE_DURATION = 1.55
 const INVITE_ASH_START = 4.9
+const FARSI_INVITE_ASH_START = 10
 const INVITE_ASH_DURATION = 1.7
 const EASE = [0.19, 1, 0.22, 1] as const
 
@@ -181,10 +181,21 @@ export default function GraduationIntro({
 }) {
   const intro = invitationTemplate.universityIntro
   const colors = intro.colors
+  const isFarsi = language === 'fa'
   const prefersReducedMotion = useReducedMotion()
   const mountRef = useRef<HTMLDivElement | null>(null)
   const didRevealRef = useRef(initialRevealed)
-  const revealAt = initialRevealed ? 0 : prefersReducedMotion ? 600 : REVEAL_AT_MS
+  const autoAshStart = isFarsi ? FARSI_INVITE_ASH_START : INVITE_ASH_START
+  const autoRevealAtMs = isFarsi ? (FARSI_INVITE_ASH_START + INVITE_ASH_DURATION) * 1000 + 250 : REVEAL_AT_MS
+  const [overtureReleased, setOvertureReleased] = useState(false)
+  const [ashNowSignal, setAshNowSignal] = useState(0)
+  const revealDelay = initialRevealed
+    ? 0
+    : prefersReducedMotion
+      ? 600
+      : overtureReleased
+        ? INVITE_ASH_DURATION * 1000 + 250
+        : autoRevealAtMs
   const [revealed, setRevealed] = useState(initialRevealed)
 
   useEffect(() => {
@@ -197,9 +208,15 @@ export default function GraduationIntro({
       didRevealRef.current = true
       setRevealed(true)
       onReveal?.()
-    }, revealAt)
+    }, revealDelay)
     return () => window.clearTimeout(timer)
-  }, [onReveal, revealAt, revealed])
+  }, [onReveal, revealDelay, revealed])
+
+  function releaseFarsiOverture() {
+    if (!isFarsi || revealed || overtureReleased || prefersReducedMotion) return
+    setOvertureReleased(true)
+    setAshNowSignal((value) => value + 1)
+  }
 
   useEffect(() => {
     const mount = mountRef.current
@@ -261,7 +278,7 @@ export default function GraduationIntro({
     const clock = new THREE.Clock()
     let frame = 0
     // Let the ceremony title start first, then bring the cap in cleanly.
-    const capStart = initialRevealed || prefersReducedMotion ? -10 : REVEAL_AT_SECONDS + 0.82
+    const capStart = initialRevealed || prefersReducedMotion || revealed ? -10 : autoRevealAtMs / 1000 + 0.82
 
     const renderFrame = () => {
       const t = clock.getElapsedTime()
@@ -311,7 +328,7 @@ export default function GraduationIntro({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [colors, initialRevealed, prefersReducedMotion])
+  }, [autoRevealAtMs, colors, initialRevealed, prefersReducedMotion, revealed])
 
   const styleVars = {
     '--university-primary': colors.primary,
@@ -322,8 +339,9 @@ export default function GraduationIntro({
 
   return (
     <motion.div
-      className={`grad-intro${revealed ? ' is-revealed' : ''}`}
-      style={styleVars}
+      className={`grad-intro${revealed ? ' is-revealed' : ''}${overtureReleased ? ' is-overture-released' : ''}`}
+      style={{ ...styleVars, '--intro-logo-duration': `${autoRevealAtMs / 1000}s` } as CSSProperties}
+      onPointerDown={releaseFarsiOverture}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{
@@ -367,8 +385,9 @@ export default function GraduationIntro({
             fontStyle={language === 'fa' ? 'normal' : 'italic'}
             writeStart={INVITE_WRITE_START}
             writeDur={INVITE_WRITE_DURATION}
-            ashStart={INVITE_ASH_START}
+            ashStart={autoAshStart}
             ashDur={INVITE_ASH_DURATION}
+            ashNowSignal={ashNowSignal}
             windScale={0.7}
             maxSize={92}
             minSize={36}

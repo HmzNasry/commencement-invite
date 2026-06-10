@@ -27,6 +27,7 @@ export default function AshText({
   writeDur = 1.0,
   ashStart = 2.1,
   ashDur = 1.3,
+  ashNowSignal = 0,
   windScale = 1,
 }: {
   text: string
@@ -43,9 +44,16 @@ export default function AshText({
   writeDur?: number
   ashStart?: number
   ashDur?: number
+  ashNowSignal?: number
   windScale?: number
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const elapsedRef = useRef(0)
+  const manualAshStartRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (ashNowSignal > 0) manualAshStartRef.current = elapsedRef.current
+  }, [ashNowSignal])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -115,10 +123,12 @@ export default function AshText({
       if (cancelled) return
       if (!start) start = now
       const t = (now - start) / 1000
+      elapsedRef.current = t
       const writeP = Math.max(0, Math.min(1, (t - writeStart) / writeDur))
-      const ashP = reduce ? 0 : Math.max(0, Math.min(1, (t - ashStart) / ashDur))
+      const effectiveAshStart = manualAshStartRef.current ?? ashStart
+      const ashP = reduce ? 0 : Math.max(0, Math.min(1, (t - effectiveAshStart) / ashDur))
       const frontN = ashP * (1 + ASH_BAND)
-      const revealEdge = t < ashStart || reduce ? writeP : 1
+      const revealEdge = t < effectiveAshStart || reduce ? writeP : 1
 
       ctx.clearRect(0, 0, W, H)
 

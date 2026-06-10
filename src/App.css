@@ -284,8 +284,12 @@ a {
   position: relative;
   z-index: 1;
   width: clamp(132px, 34cqw, 252px);
-  animation: gradIntroLogoHoldThenFade 6.8s cubic-bezier(0.19, 1, 0.22, 1) both;
+  animation: gradIntroLogoHoldThenFade var(--intro-logo-duration, 6.8s) cubic-bezier(0.19, 1, 0.22, 1) both;
   will-change: opacity, transform, filter;
+}
+
+.grad-intro.is-overture-released .grad-intro-overture-logo {
+  animation: gradIntroLogoManualFade 1.7s cubic-bezier(0.19, 1, 0.22, 1) both;
 }
 
 .grad-intro-overture-logo img {
@@ -383,6 +387,7 @@ a {
   font-size: clamp(2.95rem, 10.4cqw, 5.05rem);
   letter-spacing: 0;
   line-height: 1.15;
+  white-space: nowrap;
 }
 
 .grad-intro-underline {
@@ -1707,6 +1712,20 @@ a {
   }
 
   72.06% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1.28);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(16px);
+    transform: scale(1.48);
+  }
+}
+
+@keyframes gradIntroLogoManualFade {
+  0% {
     opacity: 1;
     filter: blur(0);
     transform: scale(1.28);
