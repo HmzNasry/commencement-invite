@@ -351,7 +351,7 @@ function ContactPage({
         <a className="contact-page-phone" href={contactPhoneHref} dir="ltr">
           {contactPhone}
         </a>
-        <button className="contact-page-copy" type="button" onClick={copyPhone} aria-label={language === 'fa' ? 'کپی شماره' : 'Copy phone number'}>
+        <button className="contact-page-copy" type="button" onClick={copyPhone} aria-label="Copy phone number">
           <span className="event-details-copy-icon" aria-hidden="true">
             <AnimatePresence mode="wait" initial={false}>
               {copied ? (
@@ -377,7 +377,7 @@ function ContactPage({
               )}
             </AnimatePresence>
           </span>
-          <span dir={language === 'fa' ? 'rtl' : 'ltr'}>{language === 'fa' ? 'کپی' : 'Copy'}</span>
+          <span dir="ltr">Copy</span>
         </button>
       </div>
     </div>
