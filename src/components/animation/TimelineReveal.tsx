@@ -36,7 +36,7 @@ const NODES: TimelineNode[] = [
     icon: Camera,
     caption: 'Reception',
     time: '12:30 PM – 1:30 PM',
-    title: 'Celebration & Photos',
+    title: 'Greetings & Photos',
     description: 'With friends & family · Around Tacoma Dome',
   },
   {
@@ -70,7 +70,7 @@ const NODES_FA: TimelineNode[] = [
     icon: Camera,
     caption: 'پذیرایی',
     time: '12:30 PM – 1:30 PM',
-    title: 'جشن و عکس‌ها',
+    title: 'سلام و عکس‌ها',
     description: 'همراه دوستان و خانواده · اطراف Tacoma Dome',
   },
   {
