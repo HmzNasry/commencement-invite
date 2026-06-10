@@ -55,7 +55,7 @@ export const invitationTemplate: InvitationTemplate = {
     monogram: 'W',
     invite: {
       en: "You're Invited",
-      fa: 'از جناب شما احترامانه دعوت می نماییم تا در محفل فراغت اسدالله نصری تشریف آورده ممنون فرمایید.',
+      fa: 'از جناب شما احترامانه دعوت می نماییم تا در محفل فراغت اسدالله نصری تشریف آورده ممنون فرمایید۔',
     },
     occasion: {
       en: 'Commencement\nCeremony',
@@ -70,8 +70,8 @@ export const invitationTemplate: InvitationTemplate = {
       fa: 'University of Washington Tacoma',
     },
     label: {
-      en: 'Class of 2026',
-      fa: 'صنف ‎2026',
+      en: 'School of Engineering and Technology\nB.S. in Information Technology',
+      fa: 'School of Engineering and Technology\nB.S. in Information Technology',
     },
     colors: {
       primary: '#32006e',
