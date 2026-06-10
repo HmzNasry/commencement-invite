@@ -134,11 +134,11 @@ export const invitationTemplate: InvitationTemplate = {
       content: {
         en: {
           eyebrow: 'Questions',
-          title: 'If you have questions, reach out',
+          title: 'If You Have Questions, Please Reach Out',
         },
         fa: {
           eyebrow: 'سوالات',
-          title: 'اگر سوالی دارید، تماس بگیرید',
+          title: 'اگر سوالی دارید، لطفاً تماس بگیرید',
         },
       },
     },
