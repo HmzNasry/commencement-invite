@@ -55,7 +55,7 @@ export const invitationTemplate: InvitationTemplate = {
     monogram: 'W',
     invite: {
       en: "You're Invited",
-      fa: 'از جناب شما ترامانه دعوت می نماییم تا در محفل فراغت اسدالله نصری تشریف آورده ممنون فرمایید.',
+      fa: 'از جناب شما احترامانه دعوت می نماییم تا در محفل فراغت اسدالله نصری تشریف آورده ممنون فرمایید.',
     },
     occasion: {
       en: 'Commencement\nCeremony',
